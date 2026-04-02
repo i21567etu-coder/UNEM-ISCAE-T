@@ -1,6 +1,6 @@
 
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
-
+// ثم باقي الكود الخاص بك هنا
 // قم بتغيير هذا الرقم في كل مرة تقوم بتحديث الموقع ليظهر الإشعار للمستخدمين
 const CACHE_NAME = 'unem-iscae-v14';
 
