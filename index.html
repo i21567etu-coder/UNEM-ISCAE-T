@@ -1327,7 +1327,31 @@
 
         function subscribeToOneSignal() {
             window.OneSignalDeferred.push(async function(OneSignal) {
-                await OneSignal.Slidedown.promptPush();
+                // 1. فحص هل المتصفح يدعم الإشعارات
+                if (!OneSignal.Notifications.isPushSupported()) {
+                    alert(currentLang === 'ar' ? "عذراً، متصفحك لا يدعم الإشعارات (مثل بعض متصفحات الآيفون القديمة)." : "Désolé, votre navigateur ne supporte pas les notifications.");
+                    return;
+                }
+
+                // 2. فحص حالة الإشعارات الحالية
+                const permission = OneSignal.Notifications.permission;
+                
+                if (permission === true || permission === "granted") {
+                    alert(currentLang === 'ar' ? "الإشعارات مفعلة بالفعل على جهازك! 🔔" : "Les notifications sont déjà activées! 🔔");
+                    return;
+                } 
+                else if (permission === false || permission === "denied") {
+                    alert(currentLang === 'ar' ? "لقد قمت بحظر الإشعارات مسبقاً! يرجى تفعيلها من إعدادات المتصفح (القفل بجانب الرابط)." : "Vous avez bloqué les notifications. Veuillez les activer dans les paramètres du navigateur.");
+                    return;
+                }
+
+                // 3. طلب الصلاحية المباشرة من المستخدم
+                await OneSignal.Notifications.requestPermission();
+                
+                // 4. تأكيد التفعيل
+                if (OneSignal.Notifications.permission === true || OneSignal.Notifications.permission === "granted") {
+                    alert(currentLang === 'ar' ? "تم تفعيل الإشعارات بنجاح! 🔔" : "Notifications activées avec succès! 🔔");
+                }
             });
         }
 
