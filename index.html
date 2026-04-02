@@ -1,18 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "c7303355-054d-429f-b338-c5250fb67b40",
-      serviceWorkerParam: { scope: '/' },   // هذا السطر مهم جداً
-      serviceWorkerPath: "sw.js",           // وهذا السطر مهم جداً
-      notifyButton: { enable: true }        // لاظهار زر الجرس
-    });
-  });
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UNEM ISCAE - المنصة</title>
@@ -30,6 +18,17 @@
     
     <!-- مكتبة الرسوم البيانية للإحصائيات -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- مكتبة الإشعارات OneSignal -->
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "298000ad-4612-479b-9d2b-99c1250188f6",
+        });
+      });
+    </script>
 
     <!-- كود جوجل أناليتكس كدعم إضافي للمستقبل -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-PDTFN9Y84M"></script>
@@ -627,6 +626,9 @@
 
     <footer class="main-footer">
         <div class="social-buttons-container">
+            <button onclick="subscribeToOneSignal()" class="social-btn" style="background: linear-gradient(135deg, #eab308, #d97706); cursor: pointer; border: none;">
+                <i class="fas fa-bell"></i> <span data-i18n="btn_push">تفعيل الإشعارات</span>
+            </button>
             <a href="https://www.facebook.com/share/1Ce3zTEpvC/" target="_blank" class="social-btn fb-btn"><i class="fab fa-facebook"></i> <span data-i18n="fb_link">صفحتنا على فيسبوك</span></a>
             <a href="https://chat.whatsapp.com/DBg3bcBQP2q8ERsoHkRY6N" target="_blank" class="social-btn wa-btn"><i class="fab fa-whatsapp"></i> <span data-i18n="wa_link">مجتمعنا على واتساب</span></a>
         </div>
@@ -707,7 +709,8 @@
                 copyright: "جميع الحقوق محفوظة © <span id='copyright-year' style='cursor:pointer; user-select:none;'>2026</span> - UNEM ISCAE",
                 update_msg: "يتوفر تحديث جديد!",
                 update_btn: "تحديث الآن",
-                no_subjects: "لا توجد مواد مضافة حالياً"
+                no_subjects: "لا توجد مواد مضافة حالياً",
+                btn_push: "تفعيل الإشعارات"
             },
             fr: {
                 slogan: "L'UNEM, une main qui construit et une autre qui lutte",
@@ -780,7 +783,8 @@
                 copyright: "Tous droits réservés © <span id='copyright-year' style='cursor:pointer; user-select:none;'>2026</span> - UNEM ISCAE",
                 update_msg: "Mise à jour disponible !",
                 update_btn: "Mettre à jour",
-                no_subjects: "Aucune matière n'a été ajoutée pour le moment"
+                no_subjects: "Aucune matière n'a été ajoutée pour le moment",
+                btn_push: "Activer les notifications"
             }
         };
 
@@ -1320,6 +1324,12 @@
         function closeWebViewer() { document.getElementById('web-viewer-overlay').classList.add('hidden'); document.getElementById('web-frame').src = ''; }
         function openUploadModal() { document.getElementById('upload-modal-overlay').classList.remove('hidden'); updateUploadSubjects(); }
         function closeUploadModal() { document.getElementById('upload-modal-overlay').classList.add('hidden'); document.getElementById('upload-status').textContent = ''; document.getElementById('upload-form').reset(); }
+
+        function subscribeToOneSignal() {
+            window.OneSignalDeferred.push(async function(OneSignal) {
+                await OneSignal.Slidedown.promptPush();
+            });
+        }
 
         function updateUploadSubjects() {
             const spec = document.getElementById('upload-spec').value; const semester = document.getElementById('upload-semester').value; const subjectSelect = document.getElementById('upload-subject');
