@@ -19,49 +19,6 @@
     <!-- مكتبة الرسوم البيانية للإحصائيات -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- مكتبة الإشعارات OneSignal -->
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-    <script>
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
-      OneSignalDeferred.push(async function(OneSignal) {
-        await OneSignal.init({
-          appId: "298000ad-4612-479b-9d2b-99c1250188f6",
-        });
-      });
-    </script>
-
-    <!-- start webpushr code --> 
-    <script>
-      (function(w,d, s, id) {if(typeof(w.webpushr)!=='undefined') return;w.webpushr=w.webpushr||function(){(w.webpushr.q=w.webpushr.q||[]).push(arguments)};var js, fjs = d.getElementsByTagName(s)[0];js = d.createElement(s); js.id = id;js.async=1;js.src = "https://cdn.webpushr.com/app.min.js";fjs.parentNode.appendChild(js);}(window,document, 'script', 'webpushr-jssdk'));
-      
-      // كود التفعيل بمفتاحك الخاص
-      webpushr('setup',{'key':'BAJnbpR4AXgkkUSqrTpY-dMsk4t8Yn6kfYW5Li1mqpPaY65XmZGhvumsax5ddl5W4ibY5tuHAJLysCP6G8q7QFg' });
-
-      // كود لظهور الإشعار تلقائياً للطلاب الجدد بعد فتح الموقع بـ 3 ثوانٍ
-      setTimeout(function() {
-          if (typeof webpushr !== 'undefined') {
-              webpushr('prompt');
-          }
-      }, 3000);
-    </script>
-    <!-- end webpushr code -->
-
-    <!-- start webpushr code --> 
-    <script>
-      (function(w,d, s, id) {if(typeof(w.webpushr)!=='undefined') return;w.webpushr=w.webpushr||function(){(w.webpushr.q=w.webpushr.q||[]).push(arguments)};var js, fjs = d.getElementsByTagName(s)[0];js = d.createElement(s); js.id = id;js.async=1;js.src = "https://cdn.webpushr.com/app.min.js";fjs.parentNode.appendChild(js);}(window,document, 'script', 'webpushr-jssdk'));
-      
-      // كود التفعيل بمفتاحك الخاص
-      webpushr('setup',{'key':'BAJnbpR4AXgkkUSqrTpY-dMsk4t8Yn6kfYW5Li1mqpPaY65XmZGhvumsax5ddl5W4ibY5tuHAJLysCP6G8q7QFg' });
-
-      // كود لظهور الإشعار تلقائياً للطلاب الجدد بعد فتح الموقع بـ 3 ثوانٍ
-      setTimeout(function() {
-          if (typeof webpushr !== 'undefined') {
-              webpushr('prompt');
-          }
-      }, 3000);
-    </script>
-    <!-- end webpushr code -->
-
     <!-- كود جوجل أناليتكس كدعم إضافي للمستقبل -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-PDTFN9Y84M"></script>
     <script>
@@ -158,10 +115,10 @@
         @media (min-width: 950px) { .semesters-grid, .category-grid { grid-template-columns: repeat(4, 1fr); gap: 20px; } }
 
         .semester-card, .category-card { 
-            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px 5px; 
+            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 5px; 
             text-align: center; cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; 
             align-items: center; justify-content: center; position: relative; overflow: hidden; 
-            min-height: 110px; box-shadow: var(--shadow-sm);
+            min-height: 90px; box-shadow: var(--shadow-sm);
             border-bottom: 4px solid var(--theme-color, var(--primary-color));
             border-inline-end: 4px solid var(--theme-color, var(--primary-color));
         }
@@ -177,8 +134,8 @@
         html[dir="rtl"] .semester-card .icon-box, html[dir="rtl"] .category-card .icon-box { border-bottom-left-radius: 100%; }
         html[dir="ltr"] .semester-card .icon-box, html[dir="ltr"] .category-card .icon-box { border-bottom-right-radius: 100%; }
 
-        .semester-card h3, .category-card h3 { margin: 15px 0 5px 0; font-weight: 800; font-size: 0.95rem; color: var(--text-primary); z-index: 2; line-height: 1.3; }
-        .semester-card p, .category-card p { margin: 0; color: var(--text-secondary); font-size: 0.8rem; font-weight: 700; z-index: 2; line-height: 1.4; }
+        .semester-card h3, .category-card h3 { margin: 12px 0 2px 0; font-weight: 800; font-size: 0.9rem; color: var(--text-primary); z-index: 2; line-height: 1.3; }
+        .semester-card p, .category-card p { margin: 0; color: var(--text-secondary); font-size: 0.75rem; font-weight: 700; z-index: 2; line-height: 1.4; }
 
         #main-menu { display: flex; flex-direction: column; }
         #main-menu .semesters-grid { 
@@ -186,7 +143,7 @@
             display: grid !important; 
             grid-template-columns: repeat(2, 1fr) !important; 
             grid-template-rows: repeat(3, 1fr); 
-            gap: 12px; 
+            gap: 8px; 
             height: 100%;
         }
         
@@ -195,10 +152,11 @@
 
         .semester-card.wide-card { 
             grid-column: 1 / -1; 
-            padding: 15px; 
+            padding: 12px; 
             display: flex;
             flex-direction: column;
             justify-content: center;
+            min-height: 85px; 
         }
         
         #main-menu .semester-card {
@@ -207,9 +165,9 @@
             justify-content: center;
         }
 
-        .semester-card.wide-card h3 { font-size: 1.15rem; margin: 15px 0 5px 0; }
-        .semester-card.wide-card p { font-size: 0.9rem; }
-        .semester-card.wide-card .icon-box { width: 50px; height: 50px; font-size: 1.3rem; }
+        .semester-card.wide-card h3 { font-size: 1.05rem; margin: 10px 0 2px 0; }
+        .semester-card.wide-card p { font-size: 0.85rem; }
+        .semester-card.wide-card .icon-box { width: 40px; height: 40px; font-size: 1.15rem; }
 
         @media (min-width: 650px) {
             .semester-card.wide-card h3 { font-size: 1.4rem; margin: 20px 0 8px 0; }
@@ -293,7 +251,7 @@
         .main-footer { background: var(--primary-color); color: white; padding: 10px 10px; text-align: center; border-radius: 20px 20px 0 0; margin-top: auto; position: relative; overflow: hidden; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); flex-shrink: 0;}
         body.dark-mode .main-footer { background: #064e3b; }
         
-        .social-btn { display: inline-flex; align-items: center; justify-content: center; padding: 10px 15px; color: white; text-decoration: none; font-weight: 800; font-size: 0.9rem; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: var(--transition); min-width: 160px; margin: 4px; }
+        .social-btn { display: inline-flex; align-items: center; justify-content: center; padding: 8px 12px; color: white; text-decoration: none; font-weight: 800; font-size: 0.85rem; border-radius: 50px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: var(--transition); min-width: 140px; margin: 3px; }
         .social-btn:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 15px rgba(0,0,0,0.3); }
         .fb-btn { background: linear-gradient(135deg, #1877F2, #0c56b9); } 
         .wa-btn { background: linear-gradient(135deg, #25D366, #1da851); }
@@ -328,22 +286,34 @@
         .accordion-content { padding: 5px 12px 15px 12px; display: none; color: var(--text-secondary); animation: fadeDown 0.3s ease-out; font-size: 0.9rem;}
         .accordion-content p { margin: 0; text-align: justify; line-height: 1.7; font-weight: 600;}
         .accordion-content.active { display: block; }
+       
         @keyframes fadeDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        #install-toast {
+            position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
+            background: var(--card-bg); border: 2px solid var(--primary-color);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4); padding: 12px;
+            border-radius: 20px; display: flex; align-items: center; gap: 10px;
+            z-index: 9998; transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 92%; max-width: 400px; justify-content: space-between;
+        }
+        #install-toast.show { bottom: 80px; }
+        .install-info { display: flex; align-items: center; gap: 10px; flex: 1; }
+        .install-icon { background: rgba(15, 81, 50, 0.1); color: var(--primary-color); width: 35px; height: 35px; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 1.2rem; }
+        .install-text { font-size: 0.8rem; font-weight: 800; color: var(--text-primary); line-height: 1.3; text-align: start; margin: 0; }
+        .install-btns { display: flex; gap: 6px; flex-shrink: 0; }
+        .btn-install { background: var(--primary-color); color: white; border: none; padding: 8px 12px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; cursor: pointer; transition: var(--transition); }
+        .btn-install:hover { background: var(--secondary-color); transform: scale(1.05); }
+        .btn-close-install { background: var(--bg-color); color: var(--text-secondary); border: 1px solid var(--border-color); padding: 8px 10px; border-radius: 10px; font-weight: 800; font-size: 0.8rem; cursor: pointer; }
 
-        /* ==================== كود ضبط شاشات الكمبيوتر (Zoom 85%) ==================== */
+        .ios-step { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; text-align: start; background: rgba(0,0,0,0.03); padding: 12px; border-radius: 12px; }
+        .ios-step i { font-size: 1.5rem; color: #007aff; } 
+        .ios-step p { margin: 0; font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
+
         @media (min-width: 1024px) {
-            body {
-                zoom: 0.85;
-                width: calc(100vw / 0.85) !important;
-                height: calc(100dvh / 0.85) !important;
-            }
-            .modal-overlay {
-                width: calc(100vw / 0.85) !important;
-                height: calc(100dvh / 0.85) !important;
-            }
-            .container {
-                max-width: 1500px; 
-            }
+            body { zoom: 0.85; width: calc(100vw / 0.85) !important; height: calc(100dvh / 0.85) !important; }
+            .modal-overlay { width: calc(100vw / 0.85) !important; height: calc(100dvh / 0.85) !important; }
+            .container { max-width: 1500px; }
         }
     </style>
 </head>
@@ -379,13 +349,15 @@
                     <p data-i18n="card_summaries_desc">جميع التخصصات (L1, L2, L3)</p>
                 </div>
 
-                <div class="semester-card wide-card" onclick="logSupabaseAnalytics('دخول قسم', 'النتائج'); openWebViewer('https://resultat-iscae.vercel.app/?parent=' + encodeURIComponent(window.location.href.split('?')[0]), i18n[currentLang]['card_results'])">
+                <!-- تم التعديل هنا ليوجه لـ /resultats مباشرة -->
+                <div class="semester-card wide-card" onclick="logSupabaseAnalytics('دخول قسم', 'النتائج'); window.location.href='/resultats'">
                     <div class="icon-box"><i class="fas fa-graduation-cap"></i></div>
                     <h3 data-i18n="card_results">نتائج المعهد</h3>
                     <p data-i18n="card_results_desc">الاستعلام عن النتائج</p>
                 </div>
 
-                <div class="semester-card" onclick="logSupabaseAnalytics('دخول قسم', 'المسابقات'); openWebViewer('https://challenge-unem-iscae.vercel.app/', i18n[currentLang]['card_competitions'])">
+                <!-- تم التعديل هنا ليوجه لـ /chalange مباشرة -->
+                <div class="semester-card" onclick="logSupabaseAnalytics('دخول قسم', 'المسابقات'); window.location.href='/chalange'">
                     <div class="icon-box"><i class="fas fa-trophy"></i></div>
                     <h3 data-i18n="card_competitions">المسابقات الثقافية والرياضية</h3>
                     <p data-i18n="card_competitions_desc">التسجيل ومتابعة المنافسات</p>
@@ -400,7 +372,7 @@
             </div>
         </div>
 
-        <!-- 2. اختيار التخصص -->
+        <!-- باقي الأكواد كما هي بدون تغيير -->
         <div id="specialization-selection" class="section-box hidden">
             <div class="header-with-back">
                 <button class="back-btn" onclick="goBackToMainMenu()" data-i18n="btn_home">الرئيسية</button>
@@ -425,7 +397,6 @@
             </div>
         </div>
 
-        <!-- 3. اختيار المستوى -->
         <div id="level-selection" class="section-box hidden">
             <div class="header-with-back">
                 <button class="back-btn" onclick="goBackToSpecialization()" data-i18n="btn_specs">التخصصات</button>
@@ -438,7 +409,6 @@
             </div>
         </div>
 
-        <!-- 4. الفصول -->
         <div id="semesters-container" class="section-box hidden">
             <div class="header-with-back">
                 <button class="back-btn" onclick="goBackToLevels()" data-i18n="btn_levels">المستويات</button>
@@ -447,7 +417,6 @@
             <div id="semesters-grid-view" class="semesters-grid"></div>
         </div>
 
-        <!-- 5. قائمة المواد -->
         <div id="subjects-container" class="section-box hidden">
             <div class="header-with-back">
                 <button class="back-btn" onclick="goBackToSemesters()" data-i18n="btn_sems">الفصول</button>
@@ -456,7 +425,6 @@
             <div id="dynamic-subjects-list" class="buttons-grid hidden"></div>
         </div>
 
-        <!-- 6. التصنيفات -->
         <div id="category-selection-container" class="section-box hidden">
             <div class="header-with-back">
                 <button class="back-btn" onclick="goBackToSubjects()" data-i18n="btn_back">العودة</button>
@@ -471,7 +439,6 @@
             </div>
         </div>
 
-        <!-- عرض الملفات -->
         <div id="file-list-container" class="section-box hidden">
             <button class="back-btn" id="file-list-back-btn" onclick="goBackToCategories()" style="width:100%; justify-content:center; margin-bottom:15px; font-size: 0.95rem;" data-i18n="btn_back_files">عودة للخلف</button>
             <h3 style="text-align:center; margin-bottom: 15px; font-size:1.1rem;">📂 <span id="selected-subject-name" style="color:var(--primary-color)"></span></h3>
@@ -586,7 +553,7 @@
         </div>
     </div>
 
-    <!-- نافذة الإحصائيات المدمجة (تظهر كصفحة كاملة للإدارة فقط) -->
+    <!-- نافذة الإحصائيات المدمجة -->
     <div id="analytics-overlay" class="modal-overlay hidden" style="background: var(--bg-color);">
         <div class="modal-content" style="max-width: 100%; width: 100%; height: 100%; border-radius: 0; padding: 25px; border: none; box-shadow: none; display: flex; flex-direction: column; overflow-y: auto;">
             <div class="header-with-back" style="margin-bottom: 20px;">
@@ -623,7 +590,6 @@
                 </div>
             </div>
 
-            <!-- رسم بياني خطي للزيارات اليومية -->
             <div style="background: var(--card-bg); padding: 20px; border-radius: 15px; border: 1px solid var(--border-color); margin-bottom: 30px; width: 100%;">
                 <h4 style="margin-top: 0; text-align: center; color: var(--text-primary); font-size: 1.2rem; font-weight: 800; margin-bottom: 20px;">الزيارات اليومية (الفريدة) خلال الفترة</h4>
                 <div style="position: relative; width: 100%; min-height: 300px;">
@@ -655,7 +621,35 @@
         <span><i class="fas fa-sync-alt" style="color: var(--accent-color); margin-inline-end: 8px;"></i> <span data-i18n="update_msg">يتوفر تحديث جديد!</span></span>
         <button id="update-btn" data-i18n="update_btn">تحديث الآن</button>
     </div>
+    <!-- إشعار تثبيت التطبيق -->
+    <div id="install-toast">
+        <div class="install-info">
+            <div class="install-icon"><i class="fas fa-mobile-alt"></i></div>
+            <p class="install-text" data-i18n="install_msg">أضف المنصة لشاشة هاتفك لتجربة أسرع وأفضل!</p>
+        </div>
+        <div class="install-btns">
+            <button id="install-app-btn" class="btn-install" data-i18n="btn_install">تثبيت</button>
+            <button id="close-install-btn" class="btn-close-install"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
 
+    <div id="ios-install-modal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width:350px;">
+            <h2 data-i18n="ios_title" style="color: #007aff;">مستخدمي iPhone 🍎</h2>
+            <p data-i18n="ios_desc" style="font-size:0.9rem; margin-bottom:20px;">لإضافة المنصة كتطبيق، اتبع الخطوات التالية من متصفح Safari:</p>
+            
+            <div class="ios-step">
+                <i class="fas fa-arrow-up-from-bracket"></i>
+                <p data-i18n="ios_step1">1. اضغط على أيقونة "المشاركة" الموجودة أسفل الشاشة.</p>
+            </div>
+            <div class="ios-step">
+                <i class="far fa-plus-square"></i>
+                <p data-i18n="ios_step2">2. اسحب للأسفل واضغط على "إضافة للشاشة الرئيسية" (Add to Home Screen).</p>
+            </div>
+            
+            <button onclick="document.getElementById('ios-install-modal').classList.add('hidden')" class="btn-submit" style="background:#007aff; margin-top:10px;" data-i18n="btn_close_window">حسناً، فهمت</button>
+        </div>
+    </div>
     <footer class="main-footer">
         <div class="social-buttons-container">
             <a href="https://www.facebook.com/share/1Ce3zTEpvC/" target="_blank" class="social-btn fb-btn"><i class="fab fa-facebook"></i> <span data-i18n="fb_link">صفحتنا على فيسبوك</span></a>
@@ -663,7 +657,8 @@
         </div>
         <p class="copyright" data-i18n="copyright">جميع الحقوق محفوظة © <span id="copyright-year" style="cursor:pointer; user-select:none;">2026</span> - UNEM ISCAE</p>
     </footer>
-    <!-- سكربت الترجمة والوضع الليلي -->
+
+ <!-- سكربت الترجمة والوضع الليلي -->
     <script>
         const i18n = {
             ar: {
@@ -738,7 +733,12 @@
                 update_msg: "يتوفر تحديث جديد!",
                 update_btn: "تحديث الآن",
                 no_subjects: "لا توجد مواد مضافة حالياً",
-                btn_push: "تفعيل الإشعارات"
+                install_msg: "أضف المنصة لشاشة هاتفك لتجربة أسرع وأفضل!",
+                btn_install: "تثبيت",
+                ios_title: "مستخدمي iPhone 🍎",
+                ios_desc: "لإضافة المنصة كتطبيق، اتبع الخطوات التالية من متصفح Safari:",
+                ios_step1: "1. اضغط على أيقونة 'المشاركة' الموجودة أسفل الشاشة.",
+                ios_step2: "2. اسحب للأسفل واضغط على 'إضافة للشاشة الرئيسية' (Add to Home Screen)."
             },
             fr: {
                 slogan: "L'UNEM, une main qui construit et une autre qui lutte",
@@ -798,7 +798,7 @@
                 pass_placeholder: "Mot de passe",
                 btn_login: "Se connecter au panneau",
                 btn_cancel: "Annuler",
-                upload_title: "لوحة الإدارة والرفع",
+                upload_title: "Panneau d'administration",
                 lbl_spec: "Filière",
                 lbl_level: "Niveau",
                 lbl_sem: "Semestre",
@@ -812,7 +812,12 @@
                 update_msg: "Mise à jour disponible !",
                 update_btn: "Mettre à jour",
                 no_subjects: "Aucune matière n'a été ajoutée pour le moment",
-                btn_push: "Activer les notifications"
+                install_msg: "Ajoutez la plateforme à votre écran pour un accès plus rapide !",
+                btn_install: "Installer",
+                ios_title: "Utilisateurs d'iPhone 🍎",
+                ios_desc: "Pour installer l'application, suivez ces étapes depuis Safari :",
+                ios_step1: "1. Appuyez sur l'icône 'Partager' en bas de l'écran.",
+                ios_step2: "2. Faites défiler et sélectionnez 'Sur l'écran d'accueil' (Add to Home Screen)."
             }
         };
 
@@ -827,26 +832,39 @@
                     else el.innerHTML = i18n[lang][key];
                 }
             });
-            document.getElementById('lang-toggle').textContent = lang === 'ar' ? 'FR' : 'AR';
-            if(!document.getElementById('subjects-container').classList.contains('hidden') && currentSemester && currentSpecialization) {
+            
+            const langToggleBtn = document.getElementById('lang-toggle');
+            if (langToggleBtn) {
+                langToggleBtn.textContent = lang === 'ar' ? 'FR' : 'AR';
+            }
+            
+            const subjContainer = document.getElementById('subjects-container');
+            if(subjContainer && !subjContainer.classList.contains('hidden') && typeof currentSemester !== 'undefined' && typeof currentSpecialization !== 'undefined' && currentSemester && currentSpecialization) {
                 document.getElementById('current-semester-title').textContent = `${i18n[currentLang]['section_subjects']} (${currentSpecialization.toUpperCase()} - ${currentSemester.toUpperCase()})`;
             }
         }
-        document.getElementById('lang-toggle').addEventListener('click', () => setLanguage(currentLang === 'ar' ? 'fr' : 'ar'));
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            const langToggle = document.getElementById('lang-toggle');
+            if(langToggle) {
+                langToggle.addEventListener('click', () => setLanguage(currentLang === 'ar' ? 'fr' : 'ar'));
+            }
+        });
 
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
             localStorage.setItem('unem_theme', isDark ? 'dark' : 'light');
-            document.getElementById('theme-icon').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            const themeIcon = document.getElementById('theme-icon');
+            if(themeIcon) themeIcon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
         }
         
         if (localStorage.getItem('unem_theme') === 'dark') {
             document.body.classList.add('dark-mode');
-            document.getElementById('theme-icon').className = 'fas fa-sun';
+            const themeIcon = document.getElementById('theme-icon');
+            if(themeIcon) themeIcon.className = 'fas fa-sun';
         }
     </script>
-
     <script>
         document.getElementById('copyright-year').textContent = new Date().getFullYear();
         setLanguage(currentLang);
@@ -1283,7 +1301,8 @@
                 if (distinctKeywords.length > 0) {
                     const baseKeywords = distinctKeywords.map(w => w.endsWith('s') ? w.slice(0, -1) : w);
                     if (!baseKeywords.every(k => sanitizedFile.includes(k)) || !new RegExp(baseKeywords.join('.{0,35}')).test(sanitizedFile)) return false;
-                    for (let word of['assurance', 'approfondie', 'bancaire', 'international', 'internationale', 'islamique', 'portefeuille', 'tresorerie', 'patrimoine']) {
+                    // تم إضافة الكلمات الفاصلة هنا لمنع التداخل (مثل financiere و descriptive وغيرها)
+                    for (let word of ['assurance', 'approfondie', 'bancaire', 'international', 'internationale', 'islamique', 'portefeuille', 'tresorerie', 'patrimoine', 'financiere', 'financieres', 'commerciale', 'commerciales', 'descriptive', 'appliquee', 'analytique', 'nationale', 'statistique']) {
                         if (sanitizedFile.includes(word) && !sanitizedSubject.includes(word)) return false;
                     }
                     return true;
@@ -1353,36 +1372,6 @@
         function openUploadModal() { document.getElementById('upload-modal-overlay').classList.remove('hidden'); updateUploadSubjects(); }
         function closeUploadModal() { document.getElementById('upload-modal-overlay').classList.add('hidden'); document.getElementById('upload-status').textContent = ''; document.getElementById('upload-form').reset(); }
 
-        function subscribeToOneSignal() {
-            window.OneSignalDeferred.push(async function(OneSignal) {
-                // 1. فحص هل المتصفح يدعم الإشعارات
-                if (!OneSignal.Notifications.isPushSupported()) {
-                    alert(currentLang === 'ar' ? "عذراً، متصفحك لا يدعم الإشعارات (مثل بعض متصفحات الآيفون القديمة)." : "Désolé, votre navigateur ne supporte pas les notifications.");
-                    return;
-                }
-
-                // 2. فحص حالة الإشعارات الحالية
-                const permission = OneSignal.Notifications.permission;
-                
-                if (permission === true || permission === "granted") {
-                    alert(currentLang === 'ar' ? "الإشعارات مفعلة بالفعل على جهازك! 🔔" : "Les notifications sont déjà activées! 🔔");
-                    return;
-                } 
-                else if (permission === false || permission === "denied") {
-                    alert(currentLang === 'ar' ? "لقد قمت بحظر الإشعارات مسبقاً! يرجى تفعيلها من إعدادات المتصفح (القفل بجانب الرابط)." : "Vous avez bloqué les notifications. Veuillez les activer dans les paramètres du navigateur.");
-                    return;
-                }
-
-                // 3. طلب الصلاحية المباشرة من المستخدم
-                await OneSignal.Notifications.requestPermission();
-                
-                // 4. تأكيد التفعيل
-                if (OneSignal.Notifications.permission === true || OneSignal.Notifications.permission === "granted") {
-                    alert(currentLang === 'ar' ? "تم تفعيل الإشعارات بنجاح! 🔔" : "Notifications activées avec succès! 🔔");
-                }
-            });
-        }
-
         function updateUploadSubjects() {
             const spec = document.getElementById('upload-spec').value; const semester = document.getElementById('upload-semester').value; const subjectSelect = document.getElementById('upload-subject');
             subjectSelect.innerHTML = '<option value="">---</option>';
@@ -1407,6 +1396,55 @@
             statusDiv.textContent = errorCount === 0 ? `✅ تم رفع ${successCount} بنجاح!` : `⚠️ تم رفع ${successCount}، وفشل ${errorCount}`; statusDiv.className = errorCount === 0 ? 'status-msg success' : 'status-msg error';
             setTimeout(() => { uploadForm.reset(); updateUploadSubjects(); statusDiv.textContent = ''; submitBtn.disabled = false; }, 4000);
         });
+       // ================== نظام التثبيت الذكي (المحدث والآمن) ==================
+        window.addEventListener('DOMContentLoaded', (event) => {
+            let deferredPrompt;
+            const installToast = document.getElementById('install-toast');
+            const installBtn = document.getElementById('install-app-btn');
+            const closeInstallBtn = document.getElementById('close-install-btn');
+            const iosModal = document.getElementById('ios-install-modal');
+            
+            if (!installToast || !installBtn || !closeInstallBtn) return;
+
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+            const hasDismissedInstall = localStorage.getItem('unem_install_dismissed') === 'true';
+
+            // 1. نظام الـ Android والكمبيوتر
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                if (!hasDismissedInstall && !isStandalone) {
+                    setTimeout(() => { installToast.classList.add('show'); }, 3000);
+                }
+            });
+
+            // 2. نظام الـ iOS
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS && !isStandalone && !hasDismissedInstall) {
+                setTimeout(() => { installToast.classList.add('show'); }, 3000);
+            }
+
+            installBtn.addEventListener('click', async () => {
+                installToast.classList.remove('show');
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        localStorage.setItem('unem_install_dismissed', 'true');
+                    }
+                    deferredPrompt = null;
+                } else if (isIOS && iosModal) {
+                    iosModal.classList.remove('hidden');
+                }
+            });
+
+            closeInstallBtn.addEventListener('click', () => {
+                installToast.classList.remove('show');
+                localStorage.setItem('unem_install_dismissed', 'true');
+            });
+        });
+        // 
+        // =============================================================================
     </script>
 
 <!-- نظام Service Worker -->
@@ -1432,68 +1470,79 @@
                 }
             });
 
-            // 4. فحص صامت كل دقيقة واحدة (فحص مستمر لكامل المتصفحات والتطبيق)
+            // 4. فحص صامت كل 15 دقيقة (لتوفير بطارية الطلاب وبيانات الإنترنت)
             setInterval(() => {
                 reg.update();
-            }, 1 * 60 * 1000); // 1 دقيقة
+            }, 15 * 60 * 1000);
 
             reg.addEventListener('updatefound', () => {
               newWorker = reg.installing;
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                   
-                  // --- نظام الفحص الذكي للإصدارات، النتائج، والتظلمات ---
+                  // --- نظام الفحص الذكي للإصدارات، النتائج، والتظلمات (بالأرقام الصحيحة) ---
                   fetch('sw.js?t=' + new Date().getTime()) // تجاوز الكاش تماماً
                     .then(res => res.text())
                     .then(text => {
                         
-                        // تجهيز رسالة التحديث العام الافتراضية (عربي/فرنسي)
-                        let customMsg = '';
-                        if (currentLang === 'ar') {
-                            customMsg = (typeof i18n !== 'undefined' && i18n['ar'] && i18n['ar']['update_msg']) 
-                                ? i18n['ar']['update_msg'] 
-                                : 'تحديث جديد متاح للموقع 🔄';
-                        } else {
-                            customMsg = (typeof i18n !== 'undefined' && i18n['fr'] && i18n['fr']['update_msg']) 
-                                ? i18n['fr']['update_msg'] 
-                                : 'Une nouvelle mise à jour est disponible 🔄';
-                        }
+                        // 1. رسالة التحديث العام الافتراضية
+                        let customMsg = currentLang === 'ar' 
+                            ? (typeof i18n !== 'undefined' && i18n['ar']['update_msg'] ? i18n['ar']['update_msg'] : 'تحديث جديد متاح للموقع 🔄')
+                            : (typeof i18n !== 'undefined' && i18n['fr']['update_msg'] ? i18n['fr']['update_msg'] : 'Une nouvelle mise à jour est disponible 🔄');
                         
-                        // Regex مطور: يلتقط الإصدار (مثل v16) سواء بفاصلة أو بدون فاصلة
-                        // الجزء الخاص بالفاصلة أصبح اختيارياً (?: ... )?
-                        const versionMatch = text.match(/[vV]\d+(?:[.,]([1-6])(\d)?)?\b/);
-                        
-                        if (versionMatch) {
-                            const semesterNumber = versionMatch[1]; // رقم السداسي (إذا وجدت فاصلة)
-                            const isAppeal = versionMatch[2]; // رقم التظلمات (الرقم الثاني بعد الفاصلة)
+                        try {
+                            // 2. استخراج السطر الذي يحتوي على CACHE_NAME
+                            const cacheLineMatch = text.match(/CACHE_NAME\s*=\s*['"](.*?)['"]/);
+                            
+                            if (cacheLineMatch && cacheLineMatch[1]) {
+                                const cacheValue = cacheLineMatch[1]; // يستخرج مثلا: unem-iscae-v1000
+                                
+                                // 3. استخراج الرقم بعد حرف v
+                                const numberMatch = cacheValue.match(/[vV](\d+)/);
+                                
+                                if (numberMatch && numberMatch[1]) {
+                                    const versionNumber = parseInt(numberMatch[1], 10);
+                                    
+                                    let semesterNumber = 0;
+                                    let isAppeal = false;
 
-                            // إذا كان التحديث يحتوي على فاصلة (يعني تحديث نتائج)
-                            if (semesterNumber) {
-                                if (isAppeal) {
-                                    // رسالة التظلمات (رقمين بعد الفاصلة)
-                                    if (currentLang === 'ar') {
-                                        customMsg = `نتائج S${semesterNumber} بعد التظلمات أصبحت متاحة 🎓`;
-                                    } else {
-                                        customMsg = `Les résultats de S${semesterNumber} après recours sont disponibles 🎓`;
+                                    // فحص الأرقام: 1000 إلى 6000 (النتائج العادية)
+                                    if (versionNumber >= 1000 && versionNumber <= 6000 && versionNumber % 1000 === 0) {
+                                        semesterNumber = versionNumber / 1000;
+                                        isAppeal = false;
+                                    } 
+                                    // فحص الأرقام: 10000 إلى 60000 (التظلمات)
+                                    else if (versionNumber >= 10000 && versionNumber <= 60000 && versionNumber % 10000 === 0) {
+                                        semesterNumber = versionNumber / 10000;
+                                        isAppeal = true;
                                     }
-                                } else {
-                                    // الرسالة العادية للنتائج (رقم واحد بعد الفاصلة)
-                                    if (currentLang === 'ar') {
-                                        customMsg = `نتائج S${semesterNumber} أصبحت متاحة في الموقع 🎓`;
-                                    } else {
-                                        customMsg = `Les résultats de S${semesterNumber} sont disponibles 🎓`;
+
+                                    // إذا كان الرقم يطابق الحالات الخاصة بالنتائج والتظلمات
+                                    if (semesterNumber > 0) {
+                                        if (isAppeal) {
+                                            customMsg = currentLang === 'ar' 
+                                                ? `نتائج S${semesterNumber} بعد التظلمات أصبحت متاحة 🎓` 
+                                                : `Les résultats de S${semesterNumber} après recours sont disponibles 🎓`;
+                                        } else {
+                                            customMsg = currentLang === 'ar' 
+                                                ? `نتائج S${semesterNumber} أصبحت متاحة في الموقع 🎓` 
+                                                : `Les résultats de S${semesterNumber} sont disponibles 🎓`;
+                                        }
                                     }
+                                    // أي رقم آخر (مثل 17، 25، 100) سيحتفظ بالرسالة الافتراضية "تحديث جديد متاح للموقع"
                                 }
                             }
-                            // أما إذا لم تكن هناك فاصلة (مثل v16)، سيتجاهل هذا الجزء ويحتفظ برسالة التحديث العام الافتراضية المجهزة بالأعلى
+                        } catch (e) {
+                            console.log("تم الاعتماد على رسالة التحديث الافتراضية");
                         }
                         
+                        // 4. عرض الإشعار
                         const updateSpan = document.querySelector('#update-toast > span > span');
                         if (updateSpan) { updateSpan.textContent = customMsg; }
                         document.getElementById('update-toast').classList.add('show');
                     })
                     .catch(err => {
-                        // في حالة فشل القراءة لأي سبب، نعرض إشعار التحديث لتجنب تعطل النظام
+                        // في حالة فشل القراءة، نعرض إشعار التحديث لتجنب تعطل النظام
                         document.getElementById('update-toast').classList.add('show');
                     });
                   // ------------------------------------------
