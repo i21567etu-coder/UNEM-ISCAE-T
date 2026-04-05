@@ -708,25 +708,23 @@
     }
 </script>
 
-<!-- كود إضافي لتتبع الزيارات المباشرة للمسابقات في الإحصائيات الرئيسية -->
+<!-- كود إضافي لتتبع الزيارات المباشرة للنتائج في الإحصائيات الرئيسية -->
 <script>
     window.addEventListener('load', async () => {
         // نمنع تكرار الحساب لنفس الشخص مرتين
-        if (localStorage.getItem('unem_direct_visit_chalange')) return;
+        if (localStorage.getItem('unem_direct_visit_results')) return;
         try {
             // بيانات قاعدة بيانات الإحصائيات (الموجودة في المنصة الرئيسية)
             const STATS_URL = 'https://rcdaxtretxskeyghxugm.supabase.co';
             const STATS_KEY = 'sb_publishable_OupfdnKe5eQmqULV46O0wQ_xUglAncv'; 
-            
-            // لأن منصة المسابقات تستخدم متغير supabaseClient خاص بها، سننشئ متغيراً جديداً للإحصائيات
             const statsClient = supabase.createClient(STATS_URL, STATS_KEY);
             
             await statsClient.from('analytics').insert([
-                { action_type: 'دخول قسم', action_detail: 'المسابقات' }
+                { action_type: 'دخول قسم', action_detail: 'النتائج' }
             ]);
-            localStorage.setItem('unem_direct_visit_chalange', 'true');
+            localStorage.setItem('unem_direct_visit_results', 'true');
         } catch (e) {}
     });
-</script>
+ </script>
 </body>
 </html>
