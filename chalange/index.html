@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>UNEM ISCAE | Ù…Ù†ØµØ© Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø§Øª Ø§Ù„Ø±Ø³Ù…ÙŠØ©</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Cairo', sans-serif; }
+        body { background: linear-gradient(145deg, #f1f5f9 0%, #e6edf4 100%); min-height: 100vh; }[v-cloak] { display: none !important; }
+        .btn-emerald { background: linear-gradient(105deg, #059669, #047857); color: white; padding: 0.8rem 1.5rem; border-radius: 1.2rem; font-weight: 800; transition: all 0.2s ease; cursor: pointer; border: none; box-shadow: 0 8px 14px -6px rgba(5,150,105,0.3); }
+        .btn-emerald:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 14px 20px -8px rgba(5,150,105,0.5); }
+        .btn-emerald:disabled { opacity: 0.5; cursor: not-allowed; }
+        .input-field { width: 100%; padding: 0.85rem; border: 2px solid #e2e8f0; border-radius: 1.2rem; outline: none; transition: 0.2s; background: white; font-weight: 600; }
+        .input-field:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
+        .card { background: rgba(255,255,255,0.95); backdrop-filter: blur(2px); border-radius: 2rem; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); padding: 1.8rem; border: 1px solid rgba(255,255,255,0.5); }
+        .match-bg { background: radial-gradient(circle at 30% 10%, #0b1120, #030712); color: white; }
+        .timer-svg { transform: rotate(-90deg); width: 130px; height: 130px; }
+        .timer-bg { fill: none; stroke: rgba(255,255,255,0.2); stroke-width: 8; }
+        .timer-path { fill: none; stroke: #3b82f6; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.2s linear; filter: drop-shadow(0 0 6px #3b82f6); }
+        .opt-btn { background: #1e293b; border: 2px solid #334155; transition: 0.2s; padding: 1.2rem; border-radius: 1.6rem; font-weight: 800; cursor: pointer; text-align: center; color: white; }
+        .opt-btn.correct { background: #059669 !important; border-color: #10b981 !important; transform: scale(1.02); }
+        .opt-btn.wrong { background: #dc2626 !important; border-color: #ef4444 !important; }
+        .q-grid-btn { background: #1e293b; border: 2px solid #334155; color: #f1f5f9; font-weight: 900; padding: 1rem; border-radius: 1rem; transition: 0.15s; font-size: 1.8rem; }
+        .q-grid-btn:hover:not(.used) { border-color: #3b82f6; background: #2563eb; transform: scale(1.02); }
+        .q-grid-btn.used { background: #0f172a; border-color: #1e293b; color: #475569; cursor: not-allowed; opacity: 0.5; }
+        .footer { background: #022c22; border-top: 4px solid #2563eb; }
+        .animate-fade { animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @keyframes ping-slow {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.8; }
+        }
+        .animate-ping-slow { animation: ping-slow 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+        
+        /* ØªØ£Ø«ÙŠØ±Ø§Øª Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª (Toasts) */
+        .toast-enter-active, .toast-leave-active { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .toast-enter-from, .toast-leave-to { opacity: 0; transform: translateY(20px) scale(0.9); }
+
+        .rtl { direction: rtl; }
+        .ltr { direction: ltr; }
+    </style>
+</head>
+<body>
+<div id="app" v-cloak :class="lang === 'fr' ? 'ltr' : 'rtl'" class="flex flex-col min-h-screen relative">
+    
+    <header class="bg-emerald-900 text-white p-4 shadow-xl flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center gap-4">
+            <button v-if="view !== 'home'" @click="goBack" class="bg-emerald-800 hover:bg-emerald-700 p-2 rounded-xl text-sm font-bold transition px-4">{{ t('back') }}</button>
+            <h1 @click="countAdminClicks" class="text-xl md:text-2xl font-black cursor-pointer select-none tracking-tighter">UNEM <span class="text-blue-300">ISCAE</span></h1>
+        </div>
+        <div class="flex gap-2 md:gap-3">
+            <button @click="toggleLang" class="bg-white/10 px-4 py-1.5 rounded-full text-xs font-bold border border-white/30 hover:bg-white/20">{{ lang === 'ar' ? 'FR' : 'AR' }}</button>
+            <template v-if="isAdmin">
+                <button @click="view = 'admin'; loadTeams(); adminTab='teams'" class="bg-blue-600 hover:bg-blue-500 px-4 py-1.5 rounded-xl text-xs font-black shadow-lg transition">{{ t('admin') }}</button>
+                <button @click="doLogout" class="bg-red-600 hover:bg-red-500 px-4 py-1.5 rounded-xl text-xs font-black shadow-lg transition">{{ t('logout') }}</button>
+            </template>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 flex-1 flex flex-col justify-center">
+        <!-- Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ© Ø§Ù„Ø¬Ø°Ø§Ø¨Ø© -->
+        <div v-if="view === 'home'" class="flex flex-col items-center justify-center py-4 md:py-20 px-4 animate-fade flex-1">
+            <div class="relative mb-4 md:mb-10">
+                <div class="absolute inset-0 bg-emerald-400 blur-[40px] md:blur-[70px] opacity-40 rounded-full animate-pulse"></div>
+                <div class="text-6xl md:text-9xl mb-2 md:mb-6 animate-float relative z-10 drop-shadow-2xl">ðŸ†</div>
+            </div>
+            <h2 class="text-3xl md:text-7xl font-black text-slate-800 mb-4 md:mb-6 drop-shadow-md text-center bg-clip-text text-transparent bg-gradient-to-r from-emerald-900 to-blue-800">{{ t('welcome_msg') }}</h2>
+            <p class="text-base md:text-2xl text-slate-600 font-bold mb-8 md:mb-12 text-center max-w-3xl leading-relaxed">{{ t('welcome_desc') }}</p>
+            <button @click="loadCompetitions(); view='competitions'" class="relative group bg-gradient-to-r from-emerald-600 to-emerald-500 text-white text-lg md:text-2xl px-8 py-4 md:px-14 md:py-6 rounded-full shadow-[0_15px_40px_-10px_rgba(5,150,105,0.7)] font-black hover:scale-105 transition-all duration-300 overflow-hidden">
+                <span class="relative z-10">{{ t('show_competitions') }}</span>
+                <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+            </button>
+        </div>
+
+        <!-- Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø§Øª -->
+        <div v-if="view === 'competitions'" class="max-w-4xl mx-auto space-y-6 w-full animate-fade">
+            <h2 class="text-3xl font-black text-center text-emerald-900 underline decoration-blue-500 decoration-4 mb-8">{{ t('open_competitions') }}</h2>
+            
+            <!-- Ø­Ø§Ù„Ø© Ø¹Ø¯Ù… ÙˆØ¬ÙˆØ¯ Ù…Ø³Ø§Ø¨Ù‚Ø§Øª -->
+            <div v-if="competitions.length === 0" class="card flex flex-col items-center justify-center text-center p-12 border-t-8 border-blue-400 shadow-xl bg-white/90">
+                <div class="text-7xl mb-6 animate-float drop-shadow-md">â³</div>
+                <h3 class="text-3xl font-black text-slate-800 mb-3">{{ t('no_competitions_title') }}</h3>
+                <p class="text-lg text-slate-500 font-bold max-w-md">{{ t('no_competitions_desc') }}</p>
+                <button @click="view = 'home'" class="mt-8 bg-blue-100 hover:bg-blue-200 text-blue-800 px-8 py-3 rounded-2xl font-black transition shadow-sm border border-blue-200">{{ t('back_home') }}</button>
+            </div>
+
+            <!-- Ø­Ø§Ù„Ø© ÙˆØ¬ÙˆØ¯ Ù…Ø³Ø§Ø¨Ù‚Ø§Øª -->
+            <template v-else>
+                <div v-for="comp in competitions" :key="comp.id" class="card flex flex-col md:flex-row justify-between items-center border-r-8 border-emerald-600 hover:shadow-2xl transition">
+                    <div>
+                        <h3 class="text-2xl font-black text-emerald-900">{{ comp.name_ar }}</h3>
+                        <p class="text-slate-500 text-xs font-bold mt-1">ðŸ“… {{ t('reg_until') }} {{ formatDate(comp.end_date) }}</p>
+                    </div>
+                    <button @click="openRegistration(comp)" class="btn-emerald md:w-auto px-12 mt-4 md:mt-0">{{ t('register_team') }} âž•</button>
+                </div>
+            </template>
+        </div>
+
+        <!-- ØªØ³Ø¬ÙŠÙ„ Ø§Ù„ÙØ±ÙŠÙ‚ -->
+        <div v-if="view === 'register_team'" class="max-w-2xl mx-auto card border-t-8 border-emerald-600 w-full">
+            <div class="flex justify-between mb-10 relative">
+                <div class="absolute top-1/2 w-full h-1 bg-gray-200 -z-1 translate-y-[-50%]"></div>
+                <div v-for="s in 3" :key="s" class="w-10 h-10 rounded-full flex items-center justify-center font-bold z-10" :class="regStep >= s ? 'bg-emerald-600 text-white shadow-xl' : 'bg-gray-200 text-gray-500'">{{ s }}</div>
+            </div>
+            <div v-if="regStep === 1" class="space-y-4">
+                <h3 class="font-black text-emerald-800 text-xl">ðŸ“ {{ t('team_data') }}</h3>
+                <input v-model="regForm.team_name" :placeholder="t('team_name_placeholder')" class="input-field">
+                <input v-model="regForm.whatsapp_number" :placeholder="t('whatsapp_placeholder')" class="input-field">
+                <div v-for="(m, idx) in regForm.members" :key="idx" class="p-4 bg-slate-50 rounded-2xl border">
+                    <input v-model="m.name" :placeholder="t('member_name_placeholder')" class="input-field text-sm mb-2">
+                    <input v-model="m.reg_no" :placeholder="t('reg_no_placeholder')" class="input-field text-sm">
+                </div>
+                <button @click="regStep = 2" :disabled="!isStep1Valid" class="btn-emerald w-full">{{ t('next') }} âž¡</button>
+            </div>
+
+            <div v-if="regStep === 2" class="space-y-6">
+                <h3 class="font-black text-emerald-800">ðŸ“Ž {{ t('upload_docs') }}</h3>
+                <div v-for="(m, idx) in regForm.members" :key="idx" class="p-4 bg-slate-50 rounded-2xl border">
+                    <p class="font-black mb-2">{{ m.name }}</p>
+                    <div v-for="fileType in selectedComp.required_files" :key="fileType" class="mb-3">
+                        <label class="text-xs font-black text-blue-700">{{ fileType }}</label>
+                        <input type="file" @change="e => handleFileUpload(e, idx, fileType)" class="input-field text-xs py-2" accept="image/*">
+                        <span v-if="m.files[fileType]" class="text-green-600 text-[10px] font-bold">âœ… {{ t('uploaded') }}</span>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button @click="regStep = 1" class="w-1/3 bg-gray-200 font-black py-4 rounded-xl">{{ t('previous') }}</button>
+                    <button @click="regStep = 3" :disabled="!isStep2Valid || isUploading" class="w-2/3 btn-emerald">{{ t('next_payment') }} âž¡</button>
+                </div>
+            </div>
+
+            <div v-if="regStep === 3" class="space-y-6">
+                <h3 class="font-black text-emerald-800">ðŸ’° {{ t('payment_confirmation') }}</h3>
+                <select v-model="selectedBank" class="input-field font-bold">
+                    <option value="">-- {{ t('select_bank') }} --</option>
+                    <option v-for="b in selectedComp.payment_methods" :key="b.name" :value="b">{{ b.name }}</option>
+                </select>
+                <div v-if="selectedBank" class="bg-blue-50 p-4 rounded-2xl text-center border">
+                    <p class="font-black">{{ t('amount') }}: <span class="text-2xl text-blue-700">{{ selectedComp.fees }} MRU</span></p>
+                    <p class="font-mono text-sm">{{ selectedBank.name }}: {{ selectedBank.number }}</p>
+                </div>
+                <input type="file" @change="handlePaymentProofUpload" class="input-field" accept="image/*">
+                <div class="flex gap-3">
+                    <button @click="regStep = 2" class="w-1/3 bg-gray-200 font-black py-4 rounded-xl">{{ t('previous') }}</button>
+                    <button @click="submitRegistration" :disabled="!regForm.payment_proof || isUploading" class="w-2/3 btn-emerald bg-emerald-700">{{ t('submit_final_btn') }}</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ù„ÙˆØ­Ø© Ø§Ù„Ù…Ø´Ø±Ù -->
+        <div v-if="view === 'admin'" class="card shadow-2xl w-full">
+            <div class="flex gap-2 border-b overflow-x-auto pb-2 mb-6">
+                <button @click="adminTab = 'teams'; loadTeams()" :class="adminTab==='teams'?'border-b-4 border-blue-600 text-blue-700':'text-gray-600'" class="px-5 py-2 font-black text-sm whitespace-nowrap">ðŸ‘¥ {{ t('teams') }}</button>
+                <button @click="adminTab = 'manage_comp'; loadCompetitions()" :class="adminTab==='manage_comp'?'border-b-4 border-blue-600 text-blue-700':''" class="px-5 py-2 font-black text-sm whitespace-nowrap">ðŸ“‹ {{ t('competitions') }}</button>
+                <button @click="adminTab = 'manage_tracks'" :class="adminTab==='manage_tracks'?'border-b-4 border-blue-600 text-blue-700':''" class="px-5 py-2 font-black text-sm whitespace-nowrap">ðŸŽ¯ {{ t('tracks') }}</button>
+                <button @click="adminTab = 'bulk_questions'; getQuestionCount()" :class="adminTab==='bulk_questions'?'border-b-4 border-blue-600 text-blue-700':''" class="px-5 py-2 font-black text-sm whitespace-nowrap">ðŸ“š {{ t('questions_bank') }}</button>
+                <button @click="adminTab = 'engine_start'; loadCompetitions()" :class="adminTab==='engine_start'?'border-b-4 border-emerald-600 text-emerald-700':''" class="px-5 py-2 font-black text-sm whitespace-nowrap">âš¡ {{ t('start_match') }}</button>
+                <button @click="adminTab = 'new_comp'" :class="adminTab==='new_comp'?'border-b-4 border-emerald-600 text-emerald-700':''" class="px-5 py-2 font-black text-sm whitespace-nowrap">âœ¨ {{ t('new_competition') }}</button>
+            </div>
+
+            <!-- Ø§Ù„ÙØ±Ù‚ -->
+            <div v-if="adminTab === 'teams'" class="overflow-x-auto">
+                <div class="flex justify-between items-center mb-4 min-w-[600px]">
+                    <h3 class="font-black text-emerald-800 text-lg">{{ t('teams') }}</h3>
+                    <button @click="loadCompetitions(); view = 'competitions'" class="btn-emerald bg-blue-600 hover:bg-blue-500 text-sm py-2 px-6">âž• {{ t('register_as_admin') }}</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-xs min-w-[800px] border">
+                        <thead class="bg-emerald-800 text-white">
+                            <th class="p-3">{{ t('team') }}</th><th>{{ t('members') }}</th><th>{{ t('payment_proof') }}</th><th>{{ t('status') }}</th>
+                        </thead>
+                        <tbody>
+                            <tr v-for="team in allTeams" :key="team.id" class="border-b hover:bg-gray-50">
+                                <td class="p-2 font-bold">{{ team.team_name }}<br><span class="text-blue-600 text-[10px]">{{ team.whatsapp_number }}</span></td>
+                                <td class="p-2"><div v-for="m in team.members_data" class="text-[9px] border-b py-1"><b>{{ m.name }}</b> ({{ m.reg_no }})<div class="flex gap-1"><a v-for="(url,type) in m.files" :href="url" target="_blank" class="text-blue-500 underline">ðŸ“Ž{{ type }}</a></div></div></td>
+                                <td class="p-2"><a :href="team.payment_proof_url" target="_blank" class="bg-amber-100 px-2 py-1 rounded text-amber-700">{{ t('view_receipt') }}</a></td>
+                                <td class="p-2">
+                                    <div class="flex flex-col gap-1">
+                                        <button v-if="team.status !== 'accepted'" @click="updateTeamStatus(team, 'accepted')" class="bg-green-600 text-white px-3 py-1 rounded text-[10px]">{{ t('accept') }}</button>
+                                        <button v-if="team.status !== 'rejected' && team.status !== 'eliminated'" @click="updateTeamStatus(team, 'rejected')" class="bg-red-600 text-white px-3 py-1 rounded text-[10px]">{{ t('reject') }}</button>
+                                        <span v-if="team.status === 'accepted'" class="text-green-700 font-bold">âœ… {{ t('accepted') }}</span>
+                                        <span v-if="team.status === 'rejected'" class="text-red-700 font-bold">âŒ {{ t('rejected') }}</span>
+                                        <span v-if="team.status === 'eliminated'" class="text-slate-500 font-bold">ðŸ›‘ {{ t('eliminated_status') }}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Ø§Ù„Ù…Ø³Ø§Ø±Ø§Øª -->
+            <div v-if="adminTab === 'manage_tracks'" class="max-w-xl mx-auto">
+                <select v-model="selectedTrackRound" class="input-field font-bold"><option v-for="r in Object.keys(roundsConfig)" :key="r" v-show="r !== 'ÙƒØ³Ø± Ø§Ù„ØªØ¹Ø§Ø¯Ù„'">{{ r }}</option></select>
+                <div class="flex gap-2 mt-4"><input v-model="newCatName" :placeholder="t('new_category')" class="input-field"><button @click="addCategory" class="btn-emerald px-6">âž• {{ t('add') }}</button></div>
+                <div class="mt-6 space-y-2"><div v-for="(cat,idx) in roundsConfig[selectedTrackRound]" :key="idx" class="flex justify-between p-3 bg-white border rounded-2xl"><span>{{ cat }}</span><button @click="roundsConfig[selectedTrackRound].splice(idx,1)" class="text-red-500 font-bold">âœ–</button></div></div>
+            </div>
+
+            <!-- Ø¥Ù†Ø´Ø§Ø¡ Ù…Ø³Ø§Ø¨Ù‚Ø© -->
+            <div v-if="adminTab === 'new_comp'" class="grid md:grid-cols-2 gap-6">
+                <div><input v-model="newComp.name_ar" :placeholder="t('comp_name')" class="input-field"><input v-model="newComp.start_date" type="datetime-local" class="input-field"><input v-model="newComp.end_date" type="datetime-local" class="input-field"><input v-model="newComp.fees" type="number" :placeholder="t('fees')" class="input-field"><input v-model="newComp.member_limit" type="number" :placeholder="t('member_limit')" class="input-field"></div>
+                <div><div class="flex gap-2"><input v-model="tempFile" :placeholder="t('required_file')" class="input-field"><button @click="addFileField" class="bg-blue-600 text-white px-4 rounded-xl">+</button></div><div class="flex flex-wrap gap-1 my-2"><span v-for="f in newComp.required_files" class="bg-blue-100 px-2 py-1 rounded-full text-xs">{{ f }}</span></div><div class="flex gap-2 mt-3"><input v-model="tempBank.name" :placeholder="t('bank_name')" class="input-field"><input v-model="tempBank.number" :placeholder="t('account_number')" class="input-field"><button @click="addBankField" class="bg-blue-600 text-white px-4 rounded-xl">+</button></div><div v-for="b in newComp.payment_methods" class="text-xs bg-gray-100 p-2 my-1 rounded">{{ b.name }}: {{ b.number }}</div></div>
+                <button @click="saveCompetition" class="md:col-span-2 btn-emerald py-4 text-xl">ðŸ’¾ {{ t('save_publish') }}</button>
+            </div>
+
+            <!-- Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø§Øª ÙˆØªÙ…Ø¯ÙŠØ¯ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ -->
+            <div v-if="adminTab === 'manage_comp'">
+                <button @click="adminTab='new_comp'" class="btn-emerald bg-blue-600 mb-6">+ {{ t('new_competition') }}</button>
+                <div class="grid gap-4">
+                    <div v-for="c in competitions" :key="c.id" class="card flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-r-8 border-emerald-600 shadow-md">
+                        <div class="w-full md:w-auto">
+                            <span class="font-black text-xl text-emerald-900">{{ c.name_ar }}</span>
+                            <div class="text-sm text-gray-600 font-bold mt-1 bg-gray-100 p-2 rounded-lg inline-block">ðŸ“… {{ t('reg_until') }} {{ formatDate(c.end_date) }}</div>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-2 w-full md:w-auto mt-2 md:mt-0">
+                            <!-- ÙˆØ¶Ø¹ ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„ØªØ§Ø±ÙŠØ® -->
+                            <template v-if="editingCompId === c.id">
+                                <input type="datetime-local" v-model="newEndDate" class="input-field text-sm py-2 px-3 w-auto flex-1">
+                                <button @click="saveNewEndDate(c.id)" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl text-sm font-black shadow-lg transition">ðŸ’¾ {{ t('save') }}</button>
+                                <button @click="editingCompId = null" class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-xl text-sm font-black shadow-lg transition">âœ–</button>
+                            </template>
+                            <!-- Ø§Ù„ÙˆØ¶Ø¹ Ø§Ù„Ø¹Ø§Ø¯ÙŠ -->
+                            <template v-else>
+                                <!-- Ø²Ø± ØªØ¬Ø¯ÙŠØ¯ Ù…Ø¯Ø© Ø§Ù„ØªØ³Ø¬ÙŠÙ„ -->
+                                <button @click="startEditingDate(c)" class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-xl text-sm font-black shadow-lg transition flex-1 md:flex-none">â³ {{ t('extend_reg') }}</button>
+                                <button @click="deleteCompetition(c.id)" class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-xl text-sm font-black shadow-lg transition flex-1 md:flex-none">ðŸ—‘ï¸ {{ t('delete') }}</button>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ø¨Ù†Ùƒ Ø§Ù„Ø£Ø³Ø¦Ù„Ø© -->
+            <div v-if="adminTab === 'bulk_questions'" class="max-w-2xl mx-auto"><div class="bg-blue-600 text-white p-4 rounded-2xl flex justify-between"><span>ðŸ“Š {{ t('total_questions') }}: {{ qCount }}</span><button @click="getQuestionCount" class="bg-white/20 px-3 py-1 rounded">{{ t('refresh') }}</button></div><select v-model="targetRound" class="input-field my-4"><option v-for="r in Object.keys(roundsConfig)" :key="r">{{ r }}</option></select><textarea v-model="bulkInput" rows="6" class="input-field font-mono text-xs" :placeholder="t('bulk_placeholder')"></textarea><button @click="processBulkQuestions" class="btn-emerald py-4 w-full">ðŸ“¥ {{ t('import_questions') }}</button></div>
+
+            <!-- Ø¨Ø¯Ø¡ Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø© -->
+            <div v-if="adminTab === 'engine_start'" class="text-center">
+                <div v-if="matchStep === 'setup'">
+                    <select v-model="activeMatchCompId" class="input-field max-w-sm mx-auto mb-4 font-bold border-2 border-blue-500 bg-blue-50 text-blue-900 block">
+                        <option :value="null" disabled>-- {{ t('select_competition') }} --</option>
+                        <option v-for="c in competitions" :key="c.id" :value="c.id">{{ c.name_ar }}</option>
+                    </select>
+
+                    <select v-model="activeMatchRound" class="input-field max-w-sm mx-auto mb-6 border-2 border-emerald-500 block">
+                        <option v-for="r in Object.keys(roundsConfig).filter(x => x !== 'ÙƒØ³Ø± Ø§Ù„ØªØ¹Ø§Ø¯Ù„')" :key="r" :value="r">{{ r }}</option>
+                    </select>
+                    <button type="button" @click="prepareAttendance" :disabled="!activeMatchCompId" class="btn-emerald text-xl px-16">â–¶ {{ t('prepare_attendance') }}</button>
+                </div>
+                <div v-if="matchStep === 'attendance'" class="space-y-4 max-w-2xl mx-auto">
+                    <h3 class="font-black text-xl">âœ… {{ t('confirm_attendance') }}</h3>
+                    <div v-for="team in acceptedTeamsWithAttendance" :key="team.id" class="flex justify-between items-center p-4 bg-white rounded-2xl shadow border">
+                        <span class="font-bold text-lg">{{ team.team_name }}</span>
+                        <div class="flex gap-2">
+                            <button @click="team.is_present = true" :class="team.is_present ? 'bg-green-600 text-white' : 'bg-gray-200'" class="px-6 py-2 rounded-xl font-bold transition">{{ t('present') }}</button>
+                            <button @click="team.is_present = false" :class="!team.is_present ? 'bg-red-600 text-white' : 'bg-gray-200'" class="px-6 py-2 rounded-xl font-bold transition">{{ t('absent') }}</button>
+                        </div>
+                    </div>
+                    <button @click="runMatchLottery" class="btn-emerald bg-indigo-600 mt-8 py-4 px-10 text-2xl w-full">ðŸŽ² {{ t('draw_lottery') }}</button>
+                </div>
+                <div v-if="matchStep === 'lottery'" class="space-y-6 max-w-2xl mx-auto">
+                    <div v-for="(team, idx) in lotteryResult" :key="team.id" class="p-5 bg-white border-r-8 border-blue-600 rounded-2xl text-right font-black text-xl shadow">
+                        <span class="text-blue-600 ml-4">#{{ idx+1 }}</span> {{ team.team_name }}
+                    </div>
+                    <button @click="startMatchLive" class="btn-emerald bg-emerald-600 text-3xl py-6 px-12 w-full mt-8 animate-pulse shadow-xl hover:bg-emerald-500">ðŸ”¥ {{ t('launch_match') }} ðŸ”¥</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ÙˆØ§Ø¬Ù‡Ø© Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø© Ø§Ù„Ù…Ø¨Ø§Ø´Ø±Ø© -->
+    <div v-if="view === 'active_match'" class="fixed inset-0 match-bg p-4 z-[100] flex flex-col overflow-auto">
+        <div class="flex justify-between items-center bg-black/40 p-4 rounded-3xl mb-6 shadow-md backdrop-blur-sm border border-white/10">
+            <button @click="forceExitMatch" class="bg-red-700 hover:bg-red-600 transition px-6 py-2 rounded-2xl text-sm font-black shadow-lg">âŒ {{ t('end_round') }}</button>
+            <div class="text-center">
+                <div class="text-blue-300 text-xs uppercase tracking-widest">{{ activeMatchRound }}</div>
+                <div class="text-4xl md:text-5xl font-black mt-1 text-white">{{ currentPlayingTeam?.team_name || t('team') }}</div>
+            </div>
+            <!-- ØªÙ… Ø¥Ø®ÙØ§Ø¡ Ø§Ù„Ù†Ù‚Ø§Ø· Ù‡Ù†Ø§ Ù„Ù„Ø­ÙØ§Ø¸ Ø¹Ù„Ù‰ Ø­Ù…Ø§Ø³ Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø© -->
+            <div class="text-5xl font-black text-emerald-400 opacity-0 select-none pointer-events-none">0</div>
+        </div>
+
+        <!-- Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ù…Ø¬Ø§Ù„ -->
+        <div v-if="!currentQuestion && currentMatchSubStep === 'category'" class="flex-1 flex flex-col items-center justify-center text-center animate-fade">
+            <h3 class="text-3xl font-black mb-12 text-slate-200">{{ t('choose_category') }} <span class="text-blue-400">({{ t('question') }} {{ currentQNum }}{{ activeMatchRound === 'ÙƒØ³Ø± Ø§Ù„ØªØ¹Ø§Ø¯Ù„' ? '' : ' / 5' }})</span></h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl w-full">
+                <div v-for="cat in roundsConfig[activeMatchRound]" :key="cat" @click="showNumbersGrid(cat)" class="card bg-slate-800/80 cursor-pointer border-2 border-slate-600 hover:border-blue-500 hover:bg-slate-700 transition-all p-12 text-center rounded-3xl shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                    <h4 class="text-4xl font-black text-white drop-shadow-md">{{ cat }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ø´Ø¨ÙƒØ© Ø§Ù„Ø£Ø±Ù‚Ø§Ù… -->
+        <div v-if="!currentQuestion && currentMatchSubStep === 'grid'" class="flex-1 flex flex-col animate-fade">
+            <div class="flex justify-between items-center mb-6 max-w-5xl mx-auto w-full px-4">
+                <h3 class="text-3xl font-bold text-blue-300 drop-shadow-md">{{ t('category') }}: <span class="text-white">{{ selectedCat }}</span></h3>
+                <button @click="currentMatchSubStep = 'category'" class="bg-slate-700 hover:bg-slate-600 transition px-6 py-3 rounded-2xl font-bold shadow-lg border border-slate-500">â†© {{ t('back_categories') }}</button>
+            </div>
+            <div class="grid grid-cols-5 md:grid-cols-10 gap-3 max-w-5xl mx-auto w-full p-2 overflow-auto max-h-[70vh] pb-10">
+                <button v-for="n in 50" :key="n" @click="pickQuestion(n)" :class="isQuestionUsed(n) ? 'used' : ''" class="q-grid-btn text-2xl p-4 shadow-md">{{ n }}</button>
+            </div>
+        </div>
+
+        <!-- Ø¹Ø±Ø¶ Ø§Ù„Ø³Ø¤Ø§Ù„ -->
+        <div v-if="currentQuestion" class="flex-1 flex flex-col items-center justify-center max-w-5xl mx-auto w-full px-4 animate-fade">
+            <div class="relative mb-8 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+                <svg width="120" height="120" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#1e293b" stroke-width="8"/>
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round" :stroke-dasharray="283" :stroke-dashoffset="timerOffset" class="transition-all duration-1000 linear"/>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center text-5xl font-black" :class="timer <= 10 ? 'text-red-500 animate-pulse drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]' : 'text-white'">{{ timer }}</div>
+            </div>
+            <h3 class="text-3xl md:text-5xl font-black text-center mb-12 leading-relaxed text-slate-50 drop-shadow-lg">{{ currentQuestion.question_text }}</h3>
+            
+            <div v-if="showOptions && currentQuestion.options && currentQuestion.options.length" class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-12 animate-fade">
+                <div v-for="(opt, idx) in currentQuestion.options" :key="idx" @click="handleOptionClick(opt, idx)" :id="'opt-'+idx" class="opt-btn text-2xl p-6 flex items-center justify-center gap-4 shadow-lg hover:bg-slate-700">
+                    <span class="bg-blue-600 w-12 h-12 rounded-full flex items-center justify-center font-black shadow-inner">{{ idx+1 }}</span> <span class="flex-1 text-center">{{ opt }}</span>
+                </div>
+            </div>
+            
+            <div v-if="showAnswerText" class="bg-emerald-900/90 p-8 rounded-3xl text-3xl md:text-4xl font-bold text-emerald-100 mb-10 text-center w-full border-4 border-emerald-500 shadow-[0_0_40px_rgba(16,185,129,0.4)] animate-fade">
+                {{ t('correct_answer') }}: <span class="text-white">{{ currentQuestion.correct_answer }}</span>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-6 w-full max-w-3xl mt-4" v-if="!showAnswerText && !showOptions">
+                <button @click="revealAnswerOnly(false)" class="bg-blue-600 hover:bg-blue-500 p-6 rounded-2xl flex-1 text-2xl font-black shadow-lg transition border border-blue-400">ðŸ‘ï¸ {{ t('show_answer') }}</button>
+                <button v-if="activeMatchRound !== 'ÙƒØ³Ø± Ø§Ù„ØªØ¹Ø§Ø¯Ù„'" @click="showOptions = true; if(currentQuestion.options?.length) AudioSys.play(500, 'sine', 0.1);" class="bg-slate-700 hover:bg-slate-600 p-6 rounded-2xl flex-1 text-2xl font-black shadow-lg transition border border-slate-500">ðŸ”½ {{ t('show_options') }}</button>
+            </div>
+            
+            <!-- Ø£Ø²Ø±Ø§Ø± Ø§Ù„ØªØ­ÙƒÙŠÙ… ØªØªØºÙŠØ± Ø­Ø³Ø¨ Ø§Ù„Ù…Ø±Ø­Ù„Ø© (Ø¹Ø§Ø¯ÙŠØ© Ø£Ù… ÙƒØ³Ø± ØªØ¹Ø§Ø¯Ù„) -->
+            <div v-if="showAnswerText && !autoScoring" class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl mt-6 animate-fade">
+                <template v-if="activeMatchRound === 'ÙƒØ³Ø± Ø§Ù„ØªØ¹Ø§Ø¯Ù„'">
+                    <button @click="scoreQuestion(1)" class="bg-green-600 hover:bg-green-500 p-6 rounded-3xl text-3xl font-black shadow-lg border-b-4 border-green-800 transition">âœ… {{ t('correct') }} <span class="text-xl opacity-75">(+1)</span></button>
+                    <button @click="scoreQuestion(-1)" class="bg-red-600 hover:bg-red-500 p-6 rounded-3xl text-3xl font-black shadow-lg border-b-4 border-red-800 transition">âŒ {{ t('wrong') }} <span class="text-xl opacity-75">(-1)</span></button>
+                    <button @click="scoreQuestion(0)" class="md:col-span-2 bg-slate-600 hover:bg-slate-500 p-6 rounded-3xl text-3xl font-black shadow-lg border-b-4 border-slate-800 transition">â±ï¸ {{ t('timeout_no_answer') }} <span class="text-xl opacity-75">(0)</span></button>
+                </template>
+                <template v-else>
+                    <button @click="scoreQuestion(showOptions ? 1 : 3)" class="bg-green-600 hover:bg-green-500 p-8 rounded-3xl text-3xl font-black shadow-[0_10px_0_rgba(21,128,61,1)] transition active:translate-y-2 active:shadow-none">âœ… {{ t('correct') }} <span class="text-2xl opacity-80">(+{{ showOptions ? 1 : 3 }})</span></button>
+                    <button @click="scoreQuestion(0)" class="bg-red-600 hover:bg-red-500 p-8 rounded-3xl text-3xl font-black shadow-[0_10px_0_rgba(185,28,28,1)] transition active:translate-y-2 active:shadow-none">âŒ {{ t('wrong') }} <span class="text-2xl opacity-80">(0)</span></button>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ø´Ø§Ø´Ø© Ø§Ù„Ø¹Ø¯Ø§Ø¯ ÙˆØ§Ù„Ù†ØªØ§Ø¦Ø¬ Ø§Ù„Ø­Ù…Ø§Ø³ÙŠØ© -->
+    <div v-if="view === 'match_results'" class="fixed inset-0 match-bg z-[200] flex flex-col items-center justify-center overflow-auto p-4">
+        
+        <!-- Ø§Ù„Ø¹Ø¯Ø§Ø¯ Ø§Ù„ØªÙ†Ø§Ø²Ù„ÙŠ Ø§Ù„Ø­Ù…Ø§Ø³ÙŠ -->
+        <div v-if="resultTimer > 0" class="text-center flex flex-col items-center justify-center h-full w-full">
+            <h2 class="text-4xl md:text-6xl font-black mb-12 text-blue-300 drop-shadow-lg">{{ t('round_results') }} - {{ activeMatchRound }}</h2>
+            <div class="text-[180px] md:text-[250px] font-black text-emerald-400 drop-shadow-[0_0_50px_rgba(52,211,153,0.8)] animate-ping-slow leading-none">{{ resultTimer }}</div>
+        </div>
+
+        <!-- Ø§Ù„ØªØ±ØªÙŠØ¨ ÙˆØ§Ù„ÙØ±Ù‚ Ø§Ù„Ù…ØªØ£Ù‡Ù„Ø© -->
+        <div v-else class="w-full max-w-5xl bg-slate-900/95 p-8 md:p-12 rounded-3xl border-2 border-blue-500 shadow-[0_0_60px_rgba(59,130,246,0.3)] animate-fade my-auto backdrop-blur-md">
+            <h2 class="text-4xl md:text-5xl font-black text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-emerald-300 mb-12 drop-shadow-md">ðŸ† {{ t('round_results') }} - {{ activeMatchRound }}</h2>
+            
+            <div class="space-y-4 mb-12 max-h-[50vh] overflow-y-auto pr-2 custom-scroll">
+                <div v-for="(team, idx) in sortedTeams" :key="team.id" 
+                     class="flex justify-between items-center p-6 rounded-2xl border-2 font-bold text-xl md:text-2xl transition-all shadow-lg"
+                     :class="idx < qualifyingCount ? 'bg-emerald-900/50 border-emerald-500 text-emerald-50 shadow-[0_0_20px_rgba(16,185,129,0.2)]' : 'bg-red-900/30 border-red-800/50 text-slate-400'">
+                    <div class="flex items-center gap-6">
+                        <span class="text-4xl w-10 text-center font-black" :class="idx===0 ? 'text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]' : 'text-slate-500'">{{ idx + 1 }}</span>
+                        <span>{{ team.team_name }}</span>
+                    </div>
+                    <div class="flex items-center gap-8">
+                        <span class="text-5xl font-black" :class="idx < qualifyingCount ? 'text-emerald-400' : 'text-slate-500'">{{ team.final_score }}</span>
+                        <span class="text-sm md:text-base px-6 py-2 rounded-full whitespace-nowrap tracking-wider font-black" :class="idx < qualifyingCount ? 'bg-emerald-600 text-white shadow-[0_0_15px_rgba(5,150,105,0.8)]' : 'bg-red-900/80 text-red-200'">
+                            {{ idx < qualifyingCount ? t('qualified') : t('out') }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center justify-between bg-slate-800/80 p-6 rounded-2xl gap-6 border border-slate-600 shadow-inner">
+                <div class="flex items-center gap-4 w-full md:w-auto bg-slate-900 p-3 rounded-xl border border-slate-700">
+                    <label class="font-black text-lg text-slate-300">{{ t('qualifying_count') }}</label>
+                    <input type="number" v-model="qualifyingCount" min="1" :max="sortedTeams.length" class="input-field text-black w-24 text-center text-3xl py-1 font-black bg-slate-100 focus:bg-white border-none">
+                </div>
+                
+                <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                    <!-- ØªØ­Ø°ÙŠØ± Ø§Ù„ØªØ¹Ø§Ø¯Ù„ ÙˆØ²Ø± ÙƒØ³Ø± Ø§Ù„ØªØ¹Ø§Ø¯Ù„ -->
+                    <template v-if="hasTieBreaker">
+                        <div class="bg-red-900/60 p-5 rounded-2xl border-2 border-red-500 animate-pulse text-center w-full md:w-auto shadow-[0_0_30px_rgba(239,68,68,0.3)]">
+                            <p class="text-white font-black mb-3 text-lg">{{ t('tie_warning') }}</p>
+                            <button @click="startTieBreaker" class="btn-emerald bg-red-600 hover:bg-red-500 border-red-400 border-2 w-full text-2xl py-3 shadow-[0_0_20px_rgba(220,38,38,0.6)]">
+                                {{ t('tie_breaker_btn') }}
+                            </button>
+                        </div>
+                    </template>
+                    <!-- Ø§Ù„Ø£Ø²Ø±Ø§Ø± Ø§Ù„Ø¹Ø§Ø¯ÙŠØ© Ù„Ø¥Ù†Ù‡Ø§Ø¡ Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø£Ùˆ Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© -->
+                    <template v-else>
+                        <button @click="saveQualifiersAndEnd" class="btn-emerald bg-slate-600 hover:bg-slate-500 border-slate-400 border-2 w-full md:w-auto text-xl px-8 py-4 transition shadow-lg">
+                            {{ t('save_end_today') }} ðŸ’¾
+                        </button>
+                        <button @click="startNextRoundLive" class="btn-emerald bg-blue-600 hover:bg-blue-500 border-blue-400 border-2 w-full md:w-auto text-2xl px-10 py-4 shadow-[0_0_30px_rgba(37,99,235,0.6)] transition">
+                            {{ t('start_next_round') }}
+                        </button>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ù†Ø§ÙØ°Ø© ØªØ³Ø¬ÙŠÙ„ Ø¯Ø®ÙˆÙ„ Ø§Ù„Ù…Ø´Ø±Ù (Ù…Ø®ÙÙŠØ© Ø§ÙØªØ±Ø§Ø¶ÙŠØ§Ù‹) -->
+    <div v-if="showAdminLoginModal" class="fixed inset-0 bg-black/60 z-[400] flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl animate-fade border-t-8 border-emerald-600">
+            <h3 class="text-2xl font-black text-emerald-900 mb-6 text-center border-b pb-4">{{ t('admin_login_title') }} ðŸ”’</h3>
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">{{ t('email') }}</label>
+                    <input v-model="adminEmail" type="email" class="input-field w-full text-left" dir="ltr" @keyup.enter="handleAdminLogin" placeholder="admin@example.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">{{ t('password') }}</label>
+                    <input v-model="adminPassword" type="password" class="input-field w-full text-left" dir="ltr" @keyup.enter="handleAdminLogin" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
+                </div>
+            </div>
+            <div class="flex gap-3 mt-8">
+                <button @click="showAdminLoginModal = false" class="w-1/3 bg-gray-200 hover:bg-gray-300 font-black py-3 rounded-xl transition text-slate-700">{{ t('cancel') }}</button>
+                <button @click="handleAdminLogin" :disabled="isAuthenticating" class="w-2/3 btn-emerald flex justify-center items-center py-3">
+                    <span v-if="isAuthenticating" class="animate-spin text-xl mr-2">â³</span>
+                    {{ t('login') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ø§Ù„ØªØ°ÙŠÙŠÙ„ -->
+    <footer class="footer text-white text-center py-6 mt-10 relative z-10">
+        <p class="font-black tracking-widest text-lg md:text-xl text-emerald-100/70 drop-shadow-md">DÃ©veloppÃ© par UNEM ISCAE (MDA)</p>
+    </footer>
+
+    <!-- Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø§Ù„Ù…Ù†Ø¨Ø«Ù‚Ø© (Toasts) -->
+    <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[500] flex flex-col gap-3 pointer-events-none w-full max-w-sm px-4">
+        <transition-group name="toast">
+            <div v-for="toast in toasts" :key="toast.id" 
+                 class="px-6 py-4 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] font-black text-white text-center text-sm md:text-base backdrop-blur-lg flex items-center justify-center gap-3 w-full"
+                 :class="toast.type === 'error' ? 'bg-red-600/95 border border-red-400' : 'bg-emerald-600/95 border border-emerald-400'">
+                <span class="text-xl">{{ toast.type === 'success' ? 'âœ…' : 'âš ï¸' }}</span>
+                <span>{{ toast.message }}</span>
+            </div>
+        </transition-group>
+    </div>
+
+</div>
+
+<script>
+    const { createApp, ref, computed, onMounted } = Vue;
+    const SUPABASE_URL = "https://mcdecprparorhdzuyutk.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jZGVjcHJwYXJvcmhkenV5dXRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NDUxMDgsImV4cCI6MjA4OTUyMTEwOH0.o4DIPSeedAL3GYEBbZzkg-QU90rrkmODxFVauxttiMs";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    // Ù†Ø¸Ø§Ù… Ø§Ù„ØµÙˆØª Ø§Ù„Ù…ØªÙ‚Ø¯Ù… ÙˆØ§Ù„Ù…ØªÙƒØ§Ù…Ù„ (Ø¨Ø±Ù…Ø¬ÙŠØ§Ù‹ Ø¹Ø¨Ø± AudioContext)
+    const AudioSys = {
+        ctx: null,
+        init() { 
+            if(!this.ctx) { 
+                const AudioContext = window.AudioContext || window.webkitAudioContext; 
+                this.ctx = new AudioContext(); 
+            } 
+            if(this.ctx.state === 'suspended') this.ctx.resume(); 
+        },
+        play(freq, type='sine', dur=0.1, vol=0.1) {
+            try {
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + dur);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + dur);
+            } catch(e) {}
+        },
+        tickNormal() { this.play(600, 'sine', 0.05, 0.05); },
+        tickUrgent() { this.play(900, 'square', 0.08, 0.08); },
+        timeUp() {
+            try {
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 1.5);
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 1.5);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 1.5);
+            } catch(e) {}
+        },
+        correct() {
+            setTimeout(() => this.play(523.25, 'sine', 0.15, 0.1), 0);
+            setTimeout(() => this.play(659.25, 'sine', 0.15, 0.1), 150);
+            setTimeout(() => this.play(783.99, 'sine', 0.15, 0.1), 300);
+            setTimeout(() => this.play(1046.50, 'sine', 0.4, 0.15), 450);
+        },
+        wrong() {
+            this.play(150, 'sawtooth', 0.5, 0.2);
+        },
+        fanfare() {
+            setTimeout(() => this.play(440, 'square', 0.15, 0.1), 0);
+            setTimeout(() => this.play(440, 'square', 0.15, 0.1), 150);
+            setTimeout(() => this.play(440, 'square', 0.15, 0.1), 300);
+            setTimeout(() => this.play(587.33, 'square', 0.4, 0.15), 450);
+            setTimeout(() => this.play(880, 'square', 0.8, 0.2), 900);
+        }
+    };
+
+    createApp({
+        setup() {
+            const lang = ref('ar');
+            const view = ref('home');
+            const adminTab = ref('teams');
+            const isAdmin = ref(false);
+            
+            // Ù…ØªØºÙŠØ±Ø§Øª Ù†Ø§ÙØ°Ø© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©
+            const showAdminLoginModal = ref(false);
+            const adminEmail = ref('');
+            const adminPassword = ref('');
+            const isAuthenticating = ref(false);
+
+            let adminClickCount = 0;
+            const competitions = ref([]);
+            const allTeams = ref([]);
+            const selectedComp = ref(null);
+            const regStep = ref(1);
+            const isUploading = ref(false);
+            const selectedBank = ref(null);
+            const qCount = ref(0);
+            const targetRound = ref('Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø£ÙˆÙ„Ù‰');
+            const roundsConfig = ref({ 'Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø£ÙˆÙ„Ù‰':['Ø§Ù„Ø«Ù‚Ø§ÙØ© Ø§Ù„Ø¥Ø³Ù„Ø§Ù…ÙŠØ©', 'Ø§Ù„Ø«Ù‚Ø§ÙØ© Ø§Ù„Ø¹Ø§Ù…Ø©', 'Ø¹ÙˆØ§ØµÙ… Ø§Ù„Ø¯ÙˆÙ„'], 'Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø«Ø§Ù†ÙŠØ©':['Ø§Ù„Ø«Ù‚Ø§ÙØ© Ø§Ù„Ø¥Ø³Ù„Ø§Ù…ÙŠØ©', 'Ø§Ù„Ø«Ù‚Ø§ÙØ© Ø§Ù„Ø¹Ø§Ù…Ø©', 'Ø§Ù„Ø«Ù‚Ø§ÙØ© Ø§Ù„Ø±ÙŠØ§Ø¶ÙŠØ©'], 'Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠØ©':['Ø§Ù„Ø«Ù‚Ø§ÙØ© Ø§Ù„Ø¥Ø³Ù„Ø§Ù…ÙŠØ©', 'Ø§Ù„Ø«Ù‚Ø§ÙØ© Ø§Ù„Ø¹Ø±Ø¨ÙŠØ©', 'Ø§Ù„Ø«Ù‚Ø§ÙØ© Ø§Ù„Ø¹Ø§Ù…Ø©'], 'ÙƒØ³Ø± Ø§Ù„ØªØ¹Ø§Ø¯Ù„':['Ø§Ù„ÙÙ‚Ù‡'] });
+            const selectedTrackRound = ref('Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø£ÙˆÙ„Ù‰');
+            const newCatName = ref('');
+            
+            const activeMatchCompId = ref(null);
+            const editingCompId = ref(null);
+            const newEndDate = ref('');
+
+            const matchStep = ref('setup');
+            const activeMatchRound = ref('Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø£ÙˆÙ„Ù‰');
+            let mainRoundBkp = ''; 
+            const lotteryResult = ref([]); 
+            const matchQueue = ref([]); 
+            const currentPlayingTeamIdx = ref(0);
+            const currentQNum = ref(1);
+            const currentMatchSubStep = ref('category');
+            const selectedCat = ref('');
+            const timer = ref(60);
+            let timerIntervalId = null;
+            const showOptions = ref(false);
+            const showAnswerText = ref(false);
+            const autoScoring = ref(false); 
+            let isScoringProcess = false; 
+            const activeTeamScore = ref(0);
+            const currentQuestion = ref(null);
+            const usedQs = ref(new Set());
+            const regForm = ref({ team_name: '', whatsapp_number: '', members:[], payment_proof: '' });
+            const newComp = ref({ name_ar: '', start_date: '', end_date: '', fees: 0, member_limit: 1, required_files:[], payment_methods:[] });
+            const tempFile = ref('');
+            const tempBank = ref({ name: '', number: '' });
+            const bulkInput = ref('');
+            const acceptedTeamsWithAttendance = ref([]);
+            const usedQuestionIds = ref(new Set());
+            
+            const resultTimer = ref(15);
+            const qualifyingCount = ref(2);
+
+            // Ù†Ø¸Ø§Ù… Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª (Toasts)
+            const toasts = ref([]);
+            let toastId = 0;
+            const showToast = (message, type = 'success', duration = 3000) => {
+                const id = toastId++;
+                toasts.value.push({ id, message, type });
+                setTimeout(() => {
+                    toasts.value = toasts.value.filter(t => t.id !== id);
+                }, duration);
+            };
+
+            const translations = {
+                ar: {
+                    welcome_title: "Ø£Ù‡Ù„Ø§Ù‹ Ø¨Ùƒ ÙÙŠ Ù…Ù†ØµØ© Ù…Ø³Ø§Ø¨Ù‚Ø§Øª UNEM ISCAE",
+                    welcome_desc: "Ø§Ø³ØªØ¹Ø¯ Ù„ØªØ¬Ø±Ø¨Ø© ØªÙ†Ø§ÙØ³ÙŠØ© ÙØ±ÙŠØ¯Ø© Ù…Ù„ÙŠØ¦Ø© Ø¨Ø§Ù„Ø­Ù…Ø§Ø³ ÙˆØ§Ù„Ù…Ø¹Ø±ÙØ©. Ø§ÙƒØªØ´Ù Ø¥Ù…ÙƒØ§Ù†ÙŠØ§ØªÙƒØŒ Ù†Ø§ÙØ³ Ø£Ù‚ÙˆÙ‰ Ø§Ù„ÙØ±Ù‚ØŒ ÙˆÙƒÙ† Ø£Ù†Øª Ø§Ù„Ø¨Ø·Ù„",
+                    start_now: "Ø§Ø¨Ø¯Ø£ Ø§Ù„Ø¢Ù†",
+                    back: "Ø¹ÙˆØ¯Ø©", admin: "Ø§Ù„Ù…Ø´Ø±Ù", welcome_msg: "Ù…Ù†ØµØ© Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø§Øª Ø§Ù„Ø«Ù‚Ø§ÙÙŠØ© ÙˆØ§Ù„Ø±ÙŠØ§Ø¶ÙŠØ© Ø§Ù„ÙƒØ¨Ø±Ù‰", show_competitions: "Ø§Ø³ØªØ¹Ø±Ø§Ø¶ Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø§Øª Ø§Ù„Ù…ØªØ§Ø­Ø©",
+                    open_competitions: "Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø§Øª Ø§Ù„Ù…ÙØªÙˆØ­Ø© Ù„Ù„ØªØ³Ø¬ÙŠÙ„", reg_until: "ÙŠÙ†ØªÙ‡ÙŠ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ ÙÙŠ", register_team: "Ø³Ø¬Ù„ ÙØ±ÙŠÙ‚Ùƒ Ø§Ù„Ø¢Ù†",
+                    team_data: "Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ÙØ±ÙŠÙ‚ ÙˆØ§Ù„Ø£Ø¹Ø¶Ø§Ø¡", team_name_placeholder: "Ø§Ø³Ù… Ø§Ù„ÙØ±ÙŠÙ‚", whatsapp_placeholder: "Ø±Ù‚Ù… Ø§Ù„ÙˆØ§ØªØ³Ø§Ø¨",
+                    member_name_placeholder: "Ø§Ù„Ø§Ø³Ù… Ø§Ù„ÙƒØ§Ù…Ù„ Ù„Ù„Ø¹Ø¶Ùˆ", reg_no_placeholder: "Ø±Ù‚Ù… Ø§Ù„ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¬Ø§Ù…Ø¹ÙŠ", next: "Ù…ØªØ§Ø¨Ø¹Ø©", upload_docs: "Ø±ÙØ¹ Ø§Ù„ØµÙˆØ± Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©",
+                    uploaded: "ØªÙ… Ø§Ù„Ø±ÙØ¹", previous: "Ø§Ù„Ø³Ø§Ø¨Ù‚", next_payment: "Ø§Ù„ØªØ§Ù„ÙŠ Ù„Ù„Ø¯ÙØ¹", payment_confirmation: "ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø¯ÙØ¹ ÙˆØ§Ù„Ø±Ø³ÙˆÙ…",
+                    select_bank: "Ø§Ø®ØªØ± Ø§Ù„Ø­Ø³Ø§Ø¨ Ø§Ù„Ø¨Ù†ÙƒÙŠ", amount: "Ø§Ù„Ù…Ø¨Ù„Øº Ø§Ù„Ù…Ø·Ù„ÙˆØ¨", 
+                    submit_final_btn: "Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨", submit_final_success: "ØªÙ… Ø¥Ø±Ø³Ø§Ù„ Ø·Ù„Ø¨ÙƒÙ… Ø¨Ù†Ø¬Ø§Ø­", 
+                    teams: "Ø§Ù„Ù…Ø´Ø§Ø±ÙƒØ§Øª", competitions: "Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø§Øª", tracks: "Ø§Ù„Ù…Ø³Ø§Ø±Ø§Øª", questions_bank: "Ø¨Ù†Ùƒ Ø§Ù„Ø£Ø³Ø¦Ù„Ø©", start_match: "Ø¨Ø¯Ø¡ Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø©",
+                    new_competition: "Ù…Ø³Ø§Ø¨Ù‚Ø© Ø¬Ø¯ÙŠØ¯Ø©", team: "Ø§Ù„ÙØ±ÙŠÙ‚", members: "Ø§Ù„Ø£Ø¹Ø¶Ø§Ø¡", payment_proof: "ÙˆØµÙ„ Ø§Ù„Ø¯ÙØ¹", status: "Ø§Ù„Ø­Ø§Ù„Ø©",
+                    view_receipt: "Ø¹Ø±Ø¶ Ø§Ù„ÙˆØµÙ„", accept: "Ù‚Ø¨ÙˆÙ„", reject: "Ø±ÙØ¶", accepted: "Ù…Ù‚Ø¨ÙˆÙ„", new_category: "Ù…Ø¬Ø§Ù„ Ø¬Ø¯ÙŠØ¯", add: "Ø¥Ø¶Ø§ÙØ©",
+                    comp_name: "Ø§Ø³Ù… Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø©", fees: "Ø§Ù„Ø±Ø³ÙˆÙ… (MRU)", member_limit: "Ø¹Ø¯Ø¯ Ø§Ù„Ø£Ø¹Ø¶Ø§Ø¡", required_file: "Ù…Ù„Ù Ù…Ø·Ù„ÙˆØ¨",
+                    bank_name: "Ø§Ø³Ù… Ø§Ù„Ø¨Ù†Ùƒ", account_number: "Ø±Ù‚Ù… Ø§Ù„Ø­Ø³Ø§Ø¨", save_publish: "ØªÙ… Ø­ÙØ¸ ÙˆÙ†Ø´Ø± Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø©", delete: "ØªØ£ÙƒÙŠØ¯ Ø§Ù„Ø­Ø°ÙØŸ",
+                    total_questions: "Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø£Ø³Ø¦Ù„Ø©", refresh: "ØªØ­Ø¯ÙŠØ«", bulk_placeholder: "Ø³Ø¤Ø§Ù„|Ù…Ø¬Ø§Ù„|Ø¥Ø¬Ø§Ø¨Ø©|Ø®ÙŠØ§Ø±1,Ø®ÙŠØ§Ø±2,Ø®ÙŠØ§Ø±3",
+                    import_questions: "ØªÙ… Ø§Ø³ØªÙŠØ±Ø§Ø¯ Ø§Ù„Ø£Ø³Ø¦Ù„Ø© Ø¨Ù†Ø¬Ø§Ø­: ", prepare_attendance: "ØªØ£ÙƒÙŠØ¯ Ø­Ø¶ÙˆØ± Ø§Ù„ÙØ±Ù‚", confirm_attendance: "Ø³Ø¬Ù„ Ø­Ø¶ÙˆØ± Ø§Ù„ÙØ±Ù‚ Ø§Ù„Ù…Ø¹ØªÙ…Ø¯Ø©",
+                    present: "Ø­Ø§Ø¶Ø±", absent: "ØºØ§Ø¦Ø¨", draw_lottery: "Ø¥Ø¬Ø±Ø§Ø¡ Ø§Ù„Ù‚Ø±Ø¹Ø© Ø§Ù„Ø¹Ø´ÙˆØ§Ø¦ÙŠØ©", points: "Ù†Ù‚Ø§Ø·", launch_match: "Ø§Ù†Ø·Ù„Ø§Ù‚ Ø§Ù„ØªØ­Ø¯ÙŠ Ø§Ù„Ù…Ø¨Ø§Ø´Ø±",
+                    end_round: "Ø¥Ù†Ù‡Ø§Ø¡ Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø©", choose_category: "Ø§Ø®ØªØ± Ø§Ù„Ù…Ø¬Ø§Ù„ Ù„Ù„Ø¥Ø¬Ø§Ø¨Ø©", question: "Ø§Ù„Ø³Ø¤Ø§Ù„", category: "Ø§Ù„Ù…Ø¬Ø§Ù„",
+                    back_categories: "Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„Ù…Ø¬Ø§Ù„Ø§Øª", correct_answer: "Ø§Ù„Ø¥Ø¬Ø§Ø¨Ø© Ø§Ù„ØµØ­ÙŠØ­Ø©", show_answer: "Ø¥Ø¸Ù‡Ø§Ø± Ø§Ù„Ø¥Ø¬Ø§Ø¨Ø© Ø§Ù„ØµØ­ÙŠØ­Ø©",
+                    show_options: "Ø¥Ø¸Ù‡Ø§Ø± Ø§Ù„Ø®ÙŠØ§Ø±Ø§Øª", correct: "Ø¥Ø¬Ø§Ø¨Ø© ØµØ­ÙŠØ­Ø©", wrong: "Ø¥Ø¬Ø§Ø¨Ø© Ø®Ø§Ø·Ø¦Ø©",
+                    round_results: "Ù†ØªØ§Ø¦Ø¬ Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠØ©", qualified_teams: "Ø§Ù„ÙØ±Ù‚ Ø§Ù„Ù…ØªØ£Ù‡Ù„Ø©", qualifying_count: "Ø¹Ø¯Ø¯ Ø§Ù„Ù…ØªØ£Ù‡Ù„ÙŠÙ†:", 
+                    start_next_round: "Ø¨Ø¯Ø¡ Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„ØªØ§Ù„ÙŠØ©", qualified: "Ù…ØªØ£Ù‡Ù„ ðŸŽ‰", out: "Ø­Ø¸ Ø£ÙˆÙØ±",
+                    save_end_today: "Ø­ÙØ¸ Ø§Ù„Ù…ØªØ£Ù‡Ù„ÙŠÙ† ÙˆØ¥Ù†Ù‡Ø§Ø¡ Ù„Ù„ÙŠÙˆÙ…", eliminated_status: "Ù…Ù‚ØµÙŠ", register_as_admin: "ØªØ³Ø¬ÙŠÙ„ ÙØ±ÙŠÙ‚ (Ø§Ù„Ù…Ø´Ø±Ù)",
+                    timeout_no_answer: "Ù†ÙØ¯ Ø§Ù„ÙˆÙ‚Øª / Ù„Ø§ Ø¥Ø¬Ø§Ø¨Ø©", tie_warning: "âš ï¸ ÙŠÙˆØ¬Ø¯ ØªØ¹Ø§Ø¯Ù„ Ø¹Ù„Ù‰ Ø®Ø· Ø§Ù„ØªØ£Ù‡Ù„!", tie_breaker_btn: "Ø¨Ø¯Ø¡ Ø¬ÙˆÙ„Ø© ÙƒØ³Ø± Ø§Ù„ØªØ¹Ø§Ø¯Ù„ âš”ï¸",
+                    select_competition: "Ø§Ø®ØªØ± Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø© Ø§Ù„Ù…Ø¹Ù†ÙŠØ©", extend_reg: "ØªØ¬Ø¯ÙŠØ¯ Ù…Ø¯Ø© Ø§Ù„ØªØ³Ø¬ÙŠÙ„", save: "ØªÙ… Ø§Ù„Ø­ÙØ¸ Ø¨Ù†Ø¬Ø§Ø­",
+                    tie_not_broken: "Ù„Ù… ÙŠØªÙ… ÙƒØ³Ø± Ø§Ù„ØªØ¹Ø§Ø¯Ù„! Ø³ÙŠØªÙ… Ø·Ø±Ø­ Ø³Ø¤Ø§Ù„ Ø¥Ø¶Ø§ÙÙŠ Ù„ÙƒÙ„ ÙØ±ÙŠÙ‚.",
+                    no_competitions_title: "Ù„Ø§ ØªÙˆØ¬Ø¯ Ù…Ø³Ø§Ø¨Ù‚Ø§Øª Ù…ØªØ§Ø­Ø© Ø­Ø§Ù„ÙŠØ§Ù‹",
+                    no_competitions_desc: "ÙŠØ±Ø¬Ù‰ Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ø§Ø­Ù‚Ø§Ù‹ Ø£Ùˆ Ù…ØªØ§Ø¨Ø¹Ø© Ø¥Ø¹Ù„Ø§Ù†Ø§ØªÙ†Ø§ Ù„Ù…Ø¹Ø±ÙØ© Ù…ÙˆØ§Ø¹ÙŠØ¯ Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø§Øª Ø§Ù„Ù‚Ø§Ø¯Ù…Ø©.",
+                    back_home: "Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„Ø±Ø¦ÙŠØ³ÙŠØ©",
+                    no_questions: "Ù„Ø§ ØªÙˆØ¬Ø¯ Ø£Ø³Ø¦Ù„Ø© Ù…ØªØ§Ø­Ø© ÙÙŠ Ù‡Ø°Ø§ Ø§Ù„Ù…Ø¬Ø§Ù„ Ø­Ø§Ù„ÙŠØ§Ù‹!",
+                    deleted_success: "ØªÙ… Ø§Ù„Ø­Ø°Ù Ø¨Ù†Ø¬Ø§Ø­",
+                    
+                    // Ù†ØµÙˆØµ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©
+                    admin_login_title: "ØªØ³Ø¬ÙŠÙ„ Ø¯Ø®ÙˆÙ„ Ø§Ù„Ù…Ø´Ø±Ù",
+                    email: "Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ",
+                    password: "ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±",
+                    login: "ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„",
+                    cancel: "Ø¥Ù„ØºØ§Ø¡",
+                    login_failed: "Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ Ø£Ùˆ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± ØºÙŠØ± ØµØ­ÙŠØ­Ø©",
+                    logout: "ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬",
+                    logout_success: "ØªÙ… ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬ Ø¨Ù†Ø¬Ø§Ø­"
+                },
+                fr: {
+                    welcome_title: "Bienvenue sur la plateforme UNEM ISCAE",
+                    welcome_desc: "PrÃ©parez-vous pour une expÃ©rience compÃ©titive unique. DÃ©couvrez votre potentiel, affrontez les meilleures Ã©quipes et soyez le champion",
+                    start_now: "Commencer",
+                    back: "Retour", admin: "Admin", welcome_msg: "Plateforme de compÃ©titions culturelles et sportives", show_competitions: "Voir les compÃ©titions",
+                    open_competitions: "CompÃ©titions ouvertes", reg_until: "Inscription jusqu'au", register_team: "Inscrire votre Ã©quipe",
+                    team_data: "DonnÃ©es de l'Ã©quipe", team_name_placeholder: "Nom de l'Ã©quipe", whatsapp_placeholder: "NumÃ©ro WhatsApp",
+                    member_name_placeholder: "Nom complet du membre", reg_no_placeholder: "NumÃ©ro d'inscription", next: "Suivant",
+                    upload_docs: "TÃ©lÃ©charger les documents", uploaded: "TÃ©lÃ©chargÃ©", previous: "PrÃ©cÃ©dent", next_payment: "Suivant paiement",
+                    payment_confirmation: "Confirmation du paiement", select_bank: "Choisir la banque", amount: "Montant",
+                    submit_final_btn: "Envoyer la demande", submit_final_success: "Demande envoyÃ©e avec succÃ¨s",
+                    teams: "Ã‰quipes", competitions: "CompÃ©titions", tracks: "Parcours",
+                    questions_bank: "Banque de questions", start_match: "DÃ©marrer le match", new_competition: "Nouvelle compÃ©tition",
+                    team: "Ã‰quipe", members: "Membres", payment_proof: "Preuve de paiement", status: "Statut",
+                    view_receipt: "Voir reÃ§u", accept: "Accepter", reject: "Rejeter", accepted: "AcceptÃ©", new_category: "Nouvelle catÃ©gorie",
+                    add: "Ajouter", comp_name: "Nom de la compÃ©tition", fees: "Frais (MRU)", member_limit: "Nombre de membres",
+                    required_file: "Fichier requis", bank_name: "Nom de la banque", account_number: "NumÃ©ro de compte",
+                    save_publish: "CompÃ©tition enregistrÃ©e", delete: "Confirmer la suppression?", total_questions: "Total des questions",
+                    refresh: "Actualiser", bulk_placeholder: "Question|CatÃ©gorie|RÃ©ponse|Option1,Option2,Option3",
+                    import_questions: "Questions importÃ©es: ", prepare_attendance: "Confirmer la prÃ©sence", confirm_attendance: "Enregistrer la prÃ©sence des Ã©quipes",
+                    present: "PrÃ©sent", absent: "Absent", draw_lottery: "Tirage au sort", points: "Points", launch_match: "Lancer le dÃ©fi",
+                    end_round: "Terminer la compÃ©tition", choose_category: "Choisissez la catÃ©gorie", question: "Question", category: "CatÃ©gorie",
+                    back_categories: "Retour aux catÃ©gories", correct_answer: "Bonne rÃ©ponse", show_answer: "Afficher la rÃ©ponse",
+                    show_options: "Afficher les options", correct: "Bonne rÃ©ponse", wrong: "Mauvaise rÃ©ponse",
+                    round_results: "RÃ©sultats du tour", qualified_teams: "Ã‰quipes qualifiÃ©es", qualifying_count: "Nombre de qualifiÃ©s:", 
+                    start_next_round: "DÃ©marrer le tour suivant", qualified: "QualifiÃ© ðŸŽ‰", out: "Ã‰liminÃ©",
+                    save_end_today: "Enregistrer et terminer pour aujourd'hui", eliminated_status: "Ã‰liminÃ©", register_as_admin: "Inscrire une Ã©quipe (Admin)",
+                    timeout_no_answer: "Temps Ã©coulÃ© / Pas de rÃ©ponse", tie_warning: "âš ï¸ Ã‰galitÃ© sur la ligne de qualification!", tie_breaker_btn: "DÃ©marrer le bris d'Ã©galitÃ© âš”ï¸",
+                    select_competition: "SÃ©lectionnez la compÃ©tition", extend_reg: "Renouveler", save: "EnregistrÃ© avec succÃ¨s",
+                    tie_not_broken: "Ã‰galitÃ© non rompue! Une autre question sera posÃ©e Ã  chaque Ã©quipe.",
+                    no_competitions_title: "Aucune compÃ©tition disponible",
+                    no_competitions_desc: "Veuillez revenir plus tard ou suivre nos annonces pour les prochaines compÃ©titions.",
+                    back_home: "Retour Ã  l'accueil",
+                    no_questions: "Aucune question disponible dans cette catÃ©gorie pour le moment!",
+                    deleted_success: "SupprimÃ© avec succÃ¨s",
+                    
+                    // Traductions de connexion
+                    admin_login_title: "Connexion Administrateur",
+                    email: "Email",
+                    password: "Mot de passe",
+                    login: "Connexion",
+                    cancel: "Annuler",
+                    login_failed: "Email ou mot de passe incorrect",
+                    logout: "DÃ©connexion",
+                    logout_success: "DÃ©connectÃ© avec succÃ¨s"
+                }
+            };
+            const t = (key) => translations[lang.value][key] || key;
+
+            // Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø­Ø§Ù„Ø© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¹Ù†Ø¯ ØªØ­Ù…ÙŠÙ„ Ø§Ù„ØµÙØ­Ø©
+            onMounted(() => {
+                supabaseClient.auth.getSession().then(({ data }) => {
+                    if (data && data.session) {
+                        isAdmin.value = true;
+                    }
+                });
+            });
+
+            const enterFullscreen = () => {
+                const elem = document.documentElement;
+                if (elem.requestFullscreen) { elem.requestFullscreen().catch(e=>{}); }
+                else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen().catch(e=>{}); }
+                else if (elem.msRequestFullscreen) { elem.msRequestFullscreen().catch(e=>{}); }
+            };
+
+            const exitFullscreen = () => {
+                if (document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+                    if (document.exitFullscreen) { document.exitFullscreen(); }
+                    else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+                    else if (document.msExitFullscreen) { document.msExitFullscreen(); }
+                }
+            };
+
+            const toggleLang = () => { lang.value = lang.value === 'ar' ? 'fr' : 'ar'; };
+            const formatDate = (d) => d ? new Date(d).toLocaleString(lang.value === 'ar' ? 'ar-EG' : 'fr-FR', { day:'numeric', month:'short', hour:'numeric', minute:'numeric' }) : '';
+            const loadCompetitions = async () => { const { data } = await supabaseClient.from('competitions').select('*').order('created_at',{ascending:false}); competitions.value = data ||[]; };
+            const loadTeams = async () => { const { data } = await supabaseClient.from('teams').select('*').order('created_at',{ascending:false}); allTeams.value = data ||[]; };
+            const getQuestionCount = async () => { const { count } = await supabaseClient.from('questions').select('*', { count:'exact', head:true }); qCount.value = count || 0; };
+            const addCategory = () => { if(newCatName.value) { roundsConfig.value[selectedTrackRound.value].push(newCatName.value); newCatName.value = ''; } };
+            
+            // ØªÙ… ØªØ¹Ø¯ÙŠÙ„ Ù‡Ø°Ù‡ Ø§Ù„Ø¯Ø§Ù„Ø© Ù„ØªØ¸Ù‡Ø± Ù†Ø§ÙØ°Ø© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¨Ø¯Ù„Ø§Ù‹ Ù…Ù† prompt Ø§Ù„Ù‚Ø¯ÙŠÙ…
+            const countAdminClicks = () => { 
+                if (isAdmin.value) return; // Ù„Ø§ Ø­Ø§Ø¬Ø© Ù„Ù„Ù†Ù‚Ø± Ø¥Ø°Ø§ ÙƒØ§Ù† Ù…Ø³Ø¬Ù„Ø§Ù‹ Ø¨Ø§Ù„ÙØ¹Ù„
+                adminClickCount++; 
+                if(adminClickCount>=5) { 
+                    adminClickCount = 0; 
+                    showAdminLoginModal.value = true;
+                } 
+            };
+            
+            // Ø¯Ø§Ù„Ø© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© Ø§Ù„Ù…Ø±Ø¨ÙˆØ·Ø© Ø¨Ù€ Supabase
+            const handleAdminLogin = async () => {
+                if(!adminEmail.value || !adminPassword.value) return;
+                
+                isAuthenticating.value = true;
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: adminEmail.value,
+                    password: adminPassword.value
+                });
+                isAuthenticating.value = false;
+
+                if (error) {
+                    showToast(t('login_failed'), 'error', 4000);
+                } else {
+                    isAdmin.value = true;
+                    showAdminLoginModal.value = false;
+                    adminEmail.value = '';
+                    adminPassword.value = '';
+                    view.value = 'admin';
+                    loadTeams();
+                }
+            };
+
+            // Ø¯Ø§Ù„Ø© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø®Ø±ÙˆØ¬
+            const doLogout = async () => {
+                await supabaseClient.auth.signOut();
+                isAdmin.value = false;
+                view.value = 'home';
+                showToast(t('logout_success'), 'success');
+            };
+            
+            const openRegistration = (comp) => { selectedComp.value = comp; selectedBank.value = null; regForm.value = { team_name: '', whatsapp_number: '', members: Array(comp.member_limit).fill().map(()=>({ name:'', reg_no:'', files:{} })), payment_proof: '' }; regStep.value=1; view.value='register_team'; };
+            const isStep1Valid = computed(() => regForm.value.team_name && regForm.value.whatsapp_number && regForm.value.members.every(m=>m.name && m.reg_no));
+            const isStep2Valid = computed(() => regForm.value.members.every(m => selectedComp.value.required_files.every(f=> !!m.files[f])));
+            const handleFileUpload = async (event, mIdx, fType) => { const file=event.target.files[0]; if(!file) return; isUploading.value=true; const name = `member_${Date.now()}_${mIdx}.png`; const {error}=await supabaseClient.storage.from('uploads').upload(name,file); if(!error) { const {data:{publicUrl}} = supabaseClient.storage.from('uploads').getPublicUrl(name); regForm.value.members[mIdx].files = {...regForm.value.members[mIdx].files,[fType]: publicUrl}; } isUploading.value=false; };
+            const handlePaymentProofUpload = async (event) => { const file=event.target.files[0]; if(!file) return; isUploading.value=true; const name=`pay_${Date.now()}.png`; const {error}=await supabaseClient.storage.from('uploads').upload(name,file); if(!error) { const {data:{publicUrl}} = supabaseClient.storage.from('uploads').getPublicUrl(name); regForm.value.payment_proof = publicUrl; } isUploading.value=false; };
+            
+            const submitRegistration = async () => { 
+                const teamName = regForm.value.team_name.trim();
+                isUploading.value = true;
+                
+                // 1. Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø¹Ø¯Ù… ØªÙƒØ±Ø§Ø± Ø§Ø³Ù… Ø§Ù„ÙØ±ÙŠÙ‚
+                const { data: existingTeams } = await supabaseClient.from('teams').select('id').ilike('team_name', teamName).eq('competition_id', selectedComp.value.id).limit(1);
+                
+                if (existingTeams && existingTeams.length > 0) {
+                    showToast(lang.value === 'ar' ? 'Ø¹Ø°Ø±Ø§Ù‹ØŒ Ø§Ø³Ù… Ø§Ù„ÙØ±ÙŠÙ‚ Ù…Ø³Ø¬Ù„ Ù…Ø³Ø¨Ù‚Ø§Ù‹ ÙÙŠ Ù‡Ø°Ù‡ Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø©!' : 'DÃ©solÃ©, ce nom d\'Ã©quipe est dÃ©jÃ  inscrit dans cette compÃ©tition!', 'error', 4000);
+                    isUploading.value = false;
+                    return;
+                }
+
+                // 2. Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø¹Ø¯Ù… ØªÙƒØ±Ø§Ø± Ø±Ù‚Ù… Ø§Ù„ØªØ³Ø¬ÙŠÙ„ Ø¯Ø§Ø®Ù„ Ù†ÙØ³ Ø§Ù„Ø§Ø³ØªÙ…Ø§Ø±Ø©
+                const submittedRegNos = regForm.value.members.map(m => m.reg_no.trim());
+                const uniqueRegNos = new Set(submittedRegNos);
+                if (uniqueRegNos.size !== submittedRegNos.length) {
+                    showToast(lang.value === 'ar' ? 'Ø¹Ø°Ø±Ø§Ù‹ØŒ Ù„Ø§ ÙŠÙ…ÙƒÙ† ØªÙƒØ±Ø§Ø± Ø±Ù‚Ù… Ø§Ù„ØªØ³Ø¬ÙŠÙ„ ÙÙŠ Ù†ÙØ³ Ø§Ù„ÙØ±ÙŠÙ‚!' : 'DÃ©solÃ©, le numÃ©ro d\'inscription ne peut pas Ãªtre rÃ©pÃ©tÃ© dans la mÃªme Ã©quipe!', 'error', 4000);
+                    isUploading.value = false;
+                    return;
+                }
+
+                // 3. Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø¹Ø¯Ù… ØªØ³Ø¬ÙŠÙ„ Ø£ÙŠ Ø¹Ø¶Ùˆ ÙÙŠ ÙØ±ÙŠÙ‚ Ø¢Ø®Ø± Ø¯Ø§Ø®Ù„ Ù†ÙØ³ Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø© ÙÙŠ Ù‚Ø§Ø¹Ø¯Ø© Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª
+                const { data: allCompTeams } = await supabaseClient.from('teams').select('members_data').eq('competition_id', selectedComp.value.id);
+                let isDuplicateRegNo = false;
+                if (allCompTeams) {
+                    for (const team of allCompTeams) {
+                        for (const member of team.members_data) {
+                            if (submittedRegNos.includes(member.reg_no.trim())) {
+                                isDuplicateRegNo = true;
+                                break;
+                            }
+                        }
+                        if (isDuplicateRegNo) break;
+                    }
+                }
+
+                if (isDuplicateRegNo) {
+                    showToast(lang.value === 'ar' ? 'Ø¹Ø°Ø±Ø§Ù‹ØŒ Ø£Ø­Ø¯ Ø§Ù„Ø£Ø¹Ø¶Ø§Ø¡ Ù…Ø³Ø¬Ù„ Ù…Ø³Ø¨Ù‚Ø§Ù‹ ÙÙŠ ÙØ±ÙŠÙ‚ Ø¢Ø®Ø± Ø¨Ù‡Ø°Ù‡ Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø©!' : 'DÃ©solÃ©, un membre est dÃ©jÃ  inscrit dans une autre Ã©quipe pour cette compÃ©tition!', 'error', 5000);
+                    isUploading.value = false;
+                    return;
+                }
+                
+                // Ø§Ù„Ù…ØªØ§Ø¨Ø¹Ø© Ù„Ø¥Ø±Ø³Ø§Ù„ Ø§Ù„Ø·Ù„Ø¨ Ø¨Ø¹Ø¯ Ù†Ø¬Ø§Ø­ Ø¬Ù…ÙŠØ¹ Ø§Ù„ÙØ­ÙˆØµØ§Øª
+                const finalStatus = isAdmin.value ? 'accepted' : 'pending';
+                await supabaseClient.from('teams').insert([{ competition_id: selectedComp.value.id, team_name: teamName, whatsapp_number: regForm.value.whatsapp_number, members_data: regForm.value.members, payment_proof_url: regForm.value.payment_proof, status: finalStatus }]); 
+                
+                // Ø¥Ø¸Ù‡Ø§Ø± Ø±Ø³Ø§Ù„Ø© Ø§Ù„Ù†Ø¬Ø§Ø­ ÙÙ‚Ø· Ø¨Ø¹Ø¯ Ø¥ØªÙ…Ø§Ù… Ø§Ù„Ø­ÙØ¸ Ø¨Ù†Ø¬Ø§Ø­
+                showToast(t('submit_final_success'), 'success'); 
+                
+                if(isAdmin.value) { view.value = 'admin'; loadTeams(); } else { view.value = 'home'; }
+                isUploading.value = false;
+            };
+            
+            const saveCompetition = async () => { await supabaseClient.from('competitions').insert([newComp.value]); showToast(t('save_publish'), 'success'); adminTab.value='manage_comp'; loadCompetitions(); };
+            const deleteCompetition = async (id) => { if(confirm(t('delete'))) { await supabaseClient.from('competitions').delete().eq('id',id); loadCompetitions(); showToast(t('deleted_success'), 'success'); } };
+            
+            const startEditingDate = (comp) => {
+                editingCompId.value = comp.id;
+                newEndDate.value = comp.end_date ? comp.end_date.slice(0, 16) : '';
+            };
+            const saveNewEndDate = async (id) => {
+                if (!newEndDate.value) return;
+                await supabaseClient.from('competitions').update({ end_date: newEndDate.value }).eq('id', id);
+                editingCompId.value = null;
+                showToast(t('save'), 'success');
+                loadCompetitions();
+            };
+
+            const updateTeamStatus = async (team, status) => { 
+                await supabaseClient.from('teams').update({ status }).eq('id', team.id); 
+                if(status==='accepted') {
+                    const officialMsg = "Ø§Ù„Ø³Ù„Ø§Ù… Ø¹Ù„ÙŠÙƒÙ… ÙˆØ±Ø­Ù…Ø© Ø§Ù„Ù„Ù‡ ÙˆØ¨Ø±ÙƒØ§ØªÙ‡ØŒ\n\nØªØ­ÙŠØ© Ø·ÙŠØ¨Ø© Ù…Ù† Ø§Ù„Ø§ØªØ­Ø§Ø¯ Ø§Ù„ÙˆØ·Ù†ÙŠ Ù„Ø·Ù„Ø¨Ø© Ù…ÙˆØ±ÙŠØªØ§Ù†ÙŠØ§ (Ù‚Ø³Ù… Ø§Ù„Ù…Ø¹Ù‡Ø¯ Ø§Ù„Ø¹Ø§Ù„ÙŠ Ù„Ù„Ù…Ø­Ø§Ø³Ø¨Ø© ÙˆØ¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø¤Ø³Ø³Ø§Øª - ISCAE).\n\nÙŠØ³Ø¹Ø¯Ù†Ø§ Ø£Ù† Ù†Ø¨Ù„ØºÙƒÙ… Ø¨Ø£Ù†Ù‡ Ù‚Ø¯ ØªÙ… Ù‚Ø¨ÙˆÙ„ ÙØ±ÙŠÙ‚ÙƒÙ… Ø±Ø³Ù…ÙŠØ§Ù‹ Ù„Ù„Ù…Ø´Ø§Ø±ÙƒØ© ÙÙŠ Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø© Ø§Ù„Ø«Ù‚Ø§ÙÙŠØ© Ø§Ù„ÙƒØ¨Ø±Ù‰.\nÙŠØ±Ø¬Ù‰ Ø§Ù„Ø§Ø³ØªØ¹Ø¯Ø§Ø¯ ÙˆÙ…ØªØ§Ø¨Ø¹Ø© Ø§Ù„ØªØ­Ø¯ÙŠØ«Ø§Øª Ø¹Ø¨Ø± Ù‡Ø°Ù‡ Ø§Ù„Ù…Ù†ØµØ©.\n\nÙ†ØªÙ…Ù†Ù‰ Ù„ÙƒÙ… Ø§Ù„ØªÙˆÙÙŠÙ‚ ÙˆØ§Ù„Ù†Ø¬Ø§Ø­! ðŸ†";
+                    window.open(`https://wa.me/${team.whatsapp_number}?text=${encodeURIComponent(officialMsg)}`, '_blank'); 
+                }
+                loadTeams(); 
+            };
+            
+            const processBulkQuestions = async () => { const lines = bulkInput.value.split('\n').filter(l=>l.includes('|')); const qs = lines.map(l=>{ const[q,c,a,o] = l.split('|'); return { question_text: q.trim(), category: c.trim(), correct_answer: a.trim(), has_options: !!o, options: o ? o.split(',').map(x=>x.trim()) : null, round: targetRound.value, is_used: false }; }); if(qs.length) await supabaseClient.from('questions').insert(qs); showToast(`${t('import_questions')} ${qs.length}`, 'success'); bulkInput.value=''; getQuestionCount(); };
+            
+            const prepareAttendance = () => { 
+                const acceptedTeams = allTeams.value.filter(t => t.status === 'accepted' && t.competition_id === activeMatchCompId.value);
+                if (acceptedTeams.length === 0) {
+                    showToast(lang.value === 'ar' ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ ÙØ±Ù‚ Ù…Ù‚Ø¨ÙˆÙ„Ø© Ù„Ù‡Ø°Ù‡ Ø§Ù„Ù…Ø³Ø§Ø¨Ù‚Ø© Ø§Ù„Ù…Ø­Ø¯Ø¯Ø©!' : 'Aucune Ã©quipe acceptÃ©e pour cette compÃ©tition!', 'error');
+                    return;
+                }
+                acceptedTeamsWithAttendance.value = acceptedTeams.map(t => ({ ...t, is_present: false })); 
+                matchStep.value = 'attendance'; 
+            };
+
+            const runMatchLottery = () => { const presentTeams = acceptedTeamsWithAttendance.value.filter(team => team.is_present === true); if(presentTeams.length===0) { showToast(lang.value === 'ar' ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ ÙØ±Ù‚ Ø­Ø§Ø¶Ø±Ø©!' : 'Aucune Ã©quipe prÃ©sente!', 'error'); return; } const shuffled =[...presentTeams]; for(let i=shuffled.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1));[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]]; } lotteryResult.value = shuffled; matchStep.value = 'lottery'; };
+            
+            const startMatchLive = async () => { 
+                if(!lotteryResult.value.length) { showToast(lang.value === 'ar' ? 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ù†ØªØ§Ø¦Ø¬ Ù‚Ø±Ø¹Ø©!' : 'Aucun rÃ©sultat de tirage au sort!', 'error'); return; }
+                
+                for (const team of lotteryResult.value) {
+                    team.final_score = 0;
+                    await supabaseClient.from('teams').update({ final_score: 0 }).eq('id', team.id);
+                }
+
+                matchQueue.value =[...lotteryResult.value]; 
+                currentPlayingTeamIdx.value = 0; 
+                currentQNum.value = 1; 
+                activeTeamScore.value = 0; 
+                usedQuestionIds.value.clear(); 
+                usedQs.value.clear(); 
+                view.value = 'active_match'; 
+                currentMatchSubStep.value = 'category'; 
+                currentQuestion.value = null; 
+                if(timerIntervalId) clearInterval(timerIntervalId);
+
+                enterFullscreen();
+            };
+
+            const showNumbersGrid = (cat) => { selectedCat.value = cat; currentMatchSubStep.value = 'grid'; };
+            const isQuestionUsed = (num) => usedQs.value.has(`${selectedCat.value}-${num}`);
+            
+            const baseTimer = computed(() => activeMatchRound.value === 'ÙƒØ³Ø± Ø§Ù„ØªØ¹Ø§Ø¯Ù„' ? 45 : 60);
+            
+            const stopTimer = () => { if(timerIntervalId) { clearInterval(timerIntervalId); timerIntervalId = null; } };
+            
+            const startTimer = () => { 
+                stopTimer(); 
+                timer.value = baseTimer.value; 
+                timerIntervalId = setInterval(() => { 
+                    if(timer.value > 0) { 
+                        timer.value--; 
+                        if(timer.value <= 10 && timer.value > 0) {
+                            AudioSys.tickUrgent();
+                        } else if(timer.value > 10) {
+                            AudioSys.tickNormal();
+                        }
+                    } else { 
+                        stopTimer(); 
+                        AudioSys.timeUp();
+                        revealAnswerOnly(true); 
+                    } 
+                }, 1000); 
+            };
+
+            const revealAnswerOnly = (isTimeUp = false) => { 
+                stopTimer(); 
+                showAnswerText.value = true; 
+                showOptions.value = false; 
+                if(!isTimeUp) {
+                    AudioSys.play(400, 'sine', 0.2); 
+                }
+            };
+            
+            const pickQuestion = async (num) => { 
+                if(isQuestionUsed(num)) return; 
+                const { data, error } = await supabaseClient.from('questions').select('*').eq('round', activeMatchRound.value).eq('category', selectedCat.value).eq('is_used', false).limit(1); 
+                if(!data || data.length===0) { showToast(t('no_questions'), 'error'); return; } 
+                const q = data[0]; 
+
+                if (q.options && q.options.length > 0) {
+                    let shuffled =[...q.options];
+                    for (let i = shuffled.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));[shuffled[i], shuffled[j]] =[shuffled[j], shuffled[i]];
+                    }
+                    q.options = shuffled;
+                }
+
+                currentQuestion.value = q; 
+                usedQs.value.add(`${selectedCat.value}-${num}`); 
+                usedQuestionIds.value.add(q.id); 
+                await supabaseClient.from('questions').update({ is_used: true }).eq('id', q.id); 
+                showOptions.value = false; 
+                showAnswerText.value = false; 
+                startTimer(); 
+            };
+            
+            const handleOptionClick = async (opt, idx) => { 
+                if(!currentQuestion.value || showAnswerText.value) return; 
+                const isCorrect = (opt === currentQuestion.value.correct_answer); 
+                const el = document.getElementById('opt-'+idx); 
+                autoScoring.value = true; 
+                
+                if(isCorrect) { 
+                    if(el) el.classList.add('correct'); 
+                    AudioSys.correct(); 
+                    showAnswerText.value = true;
+                    setTimeout(() => scoreQuestion(1), 2500); 
+                } else { 
+                    if(el) el.classList.add('wrong'); 
+                    AudioSys.wrong(); 
+                    stopTimer(); 
+                    showAnswerText.value = true; 
+                    setTimeout(() => scoreQuestion(0), 3000); 
+                } 
+            };
+            
+            const sortedTeams = computed(() => {
+                return[...lotteryResult.value].sort((a, b) => (b.final_score || 0) - (a.final_score || 0));
+            });
+
+            const hasTieBreaker = computed(() => {
+                if (sortedTeams.value.length <= qualifyingCount.value) return false;
+                if (qualifyingCount.value === 0) return false;
+                const lastQualifyingScore = sortedTeams.value[qualifyingCount.value - 1]?.final_score;
+                const firstEliminatedScore = sortedTeams.value[qualifyingCount.value]?.final_score;
+                return lastQualifyingScore !== undefined && lastQualifyingScore === firstEliminatedScore;
+            });
+
+            const tiedTeams = computed(() => {
+                if (!hasTieBreaker.value) return[];
+                const tieScore = sortedTeams.value[qualifyingCount.value - 1].final_score;
+                return sortedTeams.value.filter(t => t.final_score === tieScore);
+            });
+
+            const startTieBreaker = () => {
+                mainRoundBkp = activeMatchRound.value;
+                activeMatchRound.value = 'ÙƒØ³Ø± Ø§Ù„ØªØ¹Ø§Ø¯Ù„';
+                matchQueue.value =[...tiedTeams.value]; 
+                currentPlayingTeamIdx.value = 0;
+                currentQNum.value = 1;
+                activeTeamScore.value = matchQueue.value[0]?.final_score || 0;
+                usedQuestionIds.value.clear();
+                usedQs.value.clear();
+                view.value = 'active_match';
+                currentMatchSubStep.value = 'category';
+            };
+
+            const showRoundResults = () => {
+                const isReturningFromTie = activeMatchRound.value === 'ÙƒØ³Ø± Ø§Ù„ØªØ¹Ø§Ø¯Ù„';
+                if (isReturningFromTie) {
+                    activeMatchRound.value = mainRoundBkp; 
+                } else {
+                    qualifyingCount.value = Math.max(1, Math.ceil(lotteryResult.value.length / 2));
+                }
+                
+                view.value = 'match_results';
+                resultTimer.value = 15; 
+                
+                const rIntv = setInterval(() => {
+                    if(resultTimer.value > 0) {
+                        resultTimer.value--;
+                        AudioSys.tickUrgent();
+                    } else {
+                        clearInterval(rIntv);
+                        AudioSys.fanfare();
+                    }
+                }, 1000);
+            };
+
+            const saveQualifiersAndEnd = async () => {
+                const qualified = sortedTeams.value.slice(0, qualifyingCount.value);
+                const eliminated = sortedTeams.value.slice(qualifyingCount.value);
+                
+                for(const team of eliminated) {
+                    await supabaseClient.from('teams').update({ status: 'eliminated' }).eq('id', team.id);
+                }
+                for(const team of qualified) {
+                    await supabaseClient.from('teams').update({ final_score: 0 }).eq('id', team.id);
+                }
+                showToast(lang.value === 'ar' ? 'ØªÙ… Ø­ÙØ¸ Ø§Ù„Ù…ØªØ£Ù‡Ù„ÙŠÙ† Ø¨Ù†Ø¬Ø§Ø­. ÙŠÙ…ÙƒÙ†Ùƒ Ø¥ØºÙ„Ø§Ù‚ Ø§Ù„Ù…ÙˆÙ‚Ø¹ ÙˆØ§Ø³ØªØ¦Ù†Ø§Ù Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ù‚Ø§Ø¯Ù…Ø© Ù„Ø§Ø­Ù‚Ø§Ù‹.' : 'QualifiÃ©s enregistrÃ©s. Vous pouvez reprendre plus tard.', 'success', 5000);
+                view.value = 'admin';
+                matchStep.value = 'setup';
+                loadTeams();
+                exitFullscreen();
+            };
+
+            const startNextRoundLive = async () => {
+                const rounds = Object.keys(roundsConfig.value).filter(r => r !== 'ÙƒØ³Ø± Ø§Ù„ØªØ¹Ø§Ø¯Ù„');
+                const currentIdx = rounds.indexOf(activeMatchRound.value);
+                
+                if (currentIdx + 1 < rounds.length) {
+                    activeMatchRound.value = rounds[currentIdx + 1];
+                    
+                    const qualified = sortedTeams.value.slice(0, qualifyingCount.value);
+                    const eliminated = sortedTeams.value.slice(qualifyingCount.value);
+                    
+                    for(const team of eliminated) {
+                        await supabaseClient.from('teams').update({ status: 'eliminated' }).eq('id', team.id);
+                    }
+                    
+                    for(const team of qualified) {
+                        team.final_score = 0;
+                        await supabaseClient.from('teams').update({ final_score: 0 }).eq('id', team.id);
+                    }
+
+                    lotteryResult.value = qualified;
+                    matchQueue.value = [...qualified];
+                    
+                    currentPlayingTeamIdx.value = 0; 
+                    currentQNum.value = 1; 
+                    activeTeamScore.value = 0; 
+                    usedQuestionIds.value.clear(); 
+                    usedQs.value.clear(); 
+                    
+                    view.value = 'active_match';
+                    currentMatchSubStep.value = 'category';
+                } else {
+                    showToast("ðŸ† " + (lang.value === 'ar' ? 'Ø§Ù†ØªÙ‡Øª Ø¬Ù…ÙŠØ¹ Ø§Ù„Ù…Ø±Ø§Ø­Ù„ Ø¨Ù†Ø¬Ø§Ø­! Ù…Ø¨Ø±ÙˆÙƒ Ù„Ù„ÙØ§Ø¦Ø²ÙŠÙ†.' : 'Toutes les Ã©tapes sont terminÃ©es! FÃ©licitations aux gagnants.'), 'success', 6000);
+                    view.value = 'admin';
+                    matchStep.value = 'setup';
+                    loadTeams();
+                    exitFullscreen();
+                }
+            };
+
+            const scoreQuestion = async (points) => { 
+                if (isScoringProcess || !currentQuestion.value) return; 
+                isScoringProcess = true;
+                
+                stopTimer(); 
+                autoScoring.value = false;
+                
+                activeTeamScore.value += points; 
+                if(matchQueue.value[currentPlayingTeamIdx.value]) { 
+                    const activeTeam = matchQueue.value[currentPlayingTeamIdx.value];
+                    activeTeam.final_score = activeTeamScore.value; 
+                    await supabaseClient.from('teams').update({ final_score: activeTeamScore.value }).eq('id', activeTeam.id); 
+                } 
+                
+                currentQuestion.value = null; 
+                showAnswerText.value = false; 
+                showOptions.value = false; 
+                
+                if(currentPlayingTeamIdx.value + 1 < matchQueue.value.length) { 
+                    currentPlayingTeamIdx.value++; 
+                    activeTeamScore.value = matchQueue.value[currentPlayingTeamIdx.value].final_score || 0; 
+                    currentMatchSubStep.value = 'category'; 
+                } else { 
+                    if (activeMatchRound.value === 'ÙƒØ³Ø± Ø§Ù„ØªØ¹Ø§Ø¯Ù„') {
+                        const uniqueScores = new Set(matchQueue.value.map(t => t.final_score));
+                        if (uniqueScores.size === 1) {
+                            showToast(t('tie_not_broken'), 'error', 4000);
+                            currentQNum.value++; 
+                            currentPlayingTeamIdx.value = 0; 
+                            activeTeamScore.value = matchQueue.value[0].final_score || 0; 
+                            currentMatchSubStep.value = 'category'; 
+                        } else {
+                            showRoundResults(); 
+                        }
+                    } else {
+                        const maxQ = 5;
+                        if(currentQNum.value < maxQ) { 
+                            currentQNum.value++; 
+                            currentPlayingTeamIdx.value = 0; 
+                            activeTeamScore.value = matchQueue.value[0].final_score || 0; 
+                            currentMatchSubStep.value = 'category'; 
+                        } else { 
+                            showRoundResults(); 
+                        } 
+                    }
+                } 
+                isScoringProcess = false;
+            };
+
+            const forceExitMatch = () => { stopTimer(); view.value='admin'; matchStep.value='setup'; currentQuestion.value=null; exitFullscreen(); };
+            const goBack = () => { if(view.value==='active_match' || view.value==='match_results') forceExitMatch(); else view.value='home'; };
+            const addFileField = () => { if(tempFile.value) { newComp.value.required_files.push(tempFile.value); tempFile.value=''; } };
+            const addBankField = () => { if(tempBank.value.name) { newComp.value.payment_methods.push({...tempBank.value}); tempBank.value={name:'',number:''}; } };
+            const currentPlayingTeam = computed(() => matchQueue.value[currentPlayingTeamIdx.value] || null);
+            const timerOffset = computed(() => 283 - (timer.value / baseTimer.value) * 283);
+
+            return {
+                lang, view, adminTab, isAdmin, competitions, allTeams, selectedComp, regStep, regForm, isStep1Valid, isStep2Valid, isUploading, selectedBank, qCount, targetRound,
+                roundsConfig, selectedTrackRound, newCatName, addCategory, matchStep, activeMatchRound, lotteryResult, currentPlayingTeam, currentQNum, currentMatchSubStep,
+                selectedCat, timer, timerOffset, showOptions, showAnswerText, autoScoring, activeTeamScore, currentQuestion, acceptedTeamsWithAttendance, t, toggleLang,
+                loadCompetitions, openRegistration, handleFileUpload, handlePaymentProofUpload, submitRegistration, countAdminClicks, loadTeams, updateTeamStatus, formatDate,
+                saveCompetition, deleteCompetition, startEditingDate, saveNewEndDate, editingCompId, newEndDate, activeMatchCompId, processBulkQuestions, getQuestionCount, prepareAttendance, runMatchLottery, startMatchLive, showNumbersGrid, pickQuestion,
+                isQuestionUsed, revealAnswerOnly, handleOptionClick, scoreQuestion, forceExitMatch, goBack, addFileField, addBankField, newComp, tempFile, tempBank, bulkInput, AudioSys,
+                resultTimer, qualifyingCount, sortedTeams, startNextRoundLive, saveQualifiersAndEnd, hasTieBreaker, startTieBreaker,
+                toasts, showToast,
+                
+                // Ø§Ù„Ù…ØªØºÙŠØ±Ø§Øª ÙˆØ§Ù„Ø¯ÙˆØ§Ù„ Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø© Ù„ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„
+                showAdminLoginModal, adminEmail, adminPassword, isAuthenticating, handleAdminLogin, doLogout
+            };
+        }
+    }).mount('#app');
+</script>
+</body>
+                  </html>
